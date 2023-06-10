@@ -1,0 +1,4 @@
+.overlay {
+    background-color: black; /* Change the color here */
+    z-index: 50;
+}
