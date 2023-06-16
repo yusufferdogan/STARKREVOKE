@@ -104,7 +104,7 @@ export function OpenModal({ available, connect, connectors }) {
                       <p>
                         {isWalletAvailable('bravoos', available)
                           ? 'Connect to Bravoos'
-                          : 'install Bravoos'}
+                          : 'Install Bravoos'}
                       </p>
                     </div>
                   </button>
