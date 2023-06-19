@@ -54,14 +54,6 @@ function Home() {
       [key]: value,
     }));
   };
-  // address => name_tag
-  const [nameTag, setNameTag] = useState({});
-  const updateNameTag = (key, value) => {
-    setNameTag((prevMap) => ({
-      ...prevMap,
-      [key]: value,
-    }));
-  };
   //only erc20 addresses
   const [addressSet, setAddressSet] = useState(new Set());
 
@@ -157,28 +149,6 @@ function Home() {
     Object.entries(erc20Map).map(([key, value]) => {
       console.log(key, value);
     });
-    // console.log(addressSet)
-    // console.log(addressSet.size)
-    // for (const item in addressSet) {
-    //   console.log(item);
-    //   try {
-    //     const contractData = await fetchData2(
-    //       `https://api.starkscan.co/api/v0/contract/${item}`
-    //     );
-    //     console.log(contractData)
-
-    //     updateNameTag(item, {
-    //       isContractNameVerified: contractData.is_verified,
-    //       name: contractData.name_tag,
-    //     });
-    //   } catch (e) {
-    //     console.log(e);
-    //   }
-    // }
-    // console.log("nametag: ",nameTag)
-    // Object.entries(nameTag).forEach(([key, value]) => {
-    //   console.log(key, value);
-    // });
   }
   useEffect(() => {
     async function fetchData() {
