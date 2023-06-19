@@ -7,6 +7,8 @@ import {
 import React from 'react';
 import { useMemo } from 'react';
 import { uint256 } from 'starknet';
+import nftAbi from '../../constants/simple-nft_abi.json';
+
 function convertSecondsToDate(seconds) {
   const milliseconds = seconds * 1000;
   const date = new Date(milliseconds);
@@ -19,6 +21,14 @@ function substr(str) {
   );
 }
 export function TransactionComponentERC721({ transaction }) {
+  const { address, status } = useAccount();
+  // const { data, isLoading, error, refetch } = useContractRead({
+  //   address: transaction.contract_address,
+  //   abi: ERC20_ABI.abi,
+  //   functionName: 'allowance',
+  //   args: [address, transaction.spender],
+  //   watch: false,
+  // });
   const calls_approve = useMemo(() => {
     const tx = {
       contractAddress: transaction.contract_address,
