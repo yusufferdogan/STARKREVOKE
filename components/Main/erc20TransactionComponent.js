@@ -39,6 +39,7 @@ export function TransactionComponent({ transaction }) {
   if (data === undefined) return <span>data is undefined...</span>;
 
   let amount = uint256.uint256ToBN(data?.remaining).toNumber() / 10 ** 18;
+  // if(amount === 0) return null;
   return (
     <div
       key={transaction.transaction_hash
