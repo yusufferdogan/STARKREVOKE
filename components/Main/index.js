@@ -1,13 +1,16 @@
 import { React, useEffect, useState } from 'react';
 import 'tailwindcss/tailwind.css';
 import MyFooter from '../Footer';
-import { TodoPage } from '../../pages/features/todos/todoPage';
-import { addTodo } from '../../pages/features/todos/todoSlice';
-import { useSelector, useDispatch } from 'react-redux';
-import { useConnectors, useAccount } from '@starknet-react/core';
+import {
+  useConnectors,
+  useAccount,
+  useContractRead,
+} from '@starknet-react/core';
 import { BigNumber, ethers } from 'ethers';
 import { useMemo } from 'react';
-
+import { TransactionComponent } from './erc20TransactionComponent';
+import { TransactionComponentERC721 } from './erc721TransactionComponent';
+import { ERC20_ABI } from '../../constants/abi';
 const fetchData2 = async (
   url = 'https://api.starkscan.co/api/v0/nft-contract/'
 ) => {
@@ -29,29 +32,46 @@ const fetchData2 = async (
     console.error(error);
   }
 };
-function convertSecondsToDate(seconds) {
-  const milliseconds = seconds * 1000;
-  const date = new Date(milliseconds);
 
-  return date;
-}
 function Home() {
-  const dispatch = useDispatch();
   const { account, address, status } = useAccount();
   const [isFetched, setIsFetched] = useState(false);
   const [transactions, setTransactions] = useState([]);
-  const [erc20Addresses, setErc20Addresses] = useState([]);
-  const [erc721Addresses, setErc721Addresses] = useState([]);
 
-  const addItemToErc20 = (item) => {
-    setErc20Addresses((prevList) => [...prevList, item]);
+  //erc20 data
+  const [erc20Map, setErc20Map] = useState({});
+  const updateErc20Map = (key, value) => {
+    setErc20Map((prevMap) => ({
+      ...prevMap,
+      [key]: value,
+    }));
   };
-  const addItemToErc721 = (item) => {
-    setErc721Addresses((prevList) => [...prevList, item]);
+  //erc721 data
+  const [erc721Map, setErc721Map] = useState({});
+  const updateErc721Map = (key, value) => {
+    setErc721Map((prevMap) => ({
+      ...prevMap,
+      [key]: value,
+    }));
+  };
+  // address => name_tag
+  const [nameTag, setNameTag] = useState({});
+  const updateNameTag = (key, value) => {
+    setNameTag((prevMap) => ({
+      ...prevMap,
+      [key]: value,
+    }));
+  };
+  //only erc20 addresses
+  const [addressSet, setAddressSet] = useState(new Set());
+
+  const addToAddressSet = (value) => {
+    setAddressSet((prevSet) => new Set([...prevSet, value]));
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   async function filterAddresses() {
+    console.log('filterAddresses');
     for (let i = 0; i < transactions.length; i++) {
       const element = transactions[i];
       if (element.account_calls.length > 0) {
@@ -63,45 +83,30 @@ function Home() {
               account_call.result.length > 0 &&
               account_call.result[0] === '0x1'
             ) {
-              let spenderName;
-              let isContractNameVerified = false;
-              try {
-                const contractData = await fetchData2(
-                  `https://api.starkscan.co/api/v0/contract/${account_call.calldata[0]}`
-                );
-                spenderName = contractData.name_tag;
-                isContractNameVerified = contractData.is_verified;
-              } catch (e) {
-                console.log(e);
-              }
-
               const obj = {
                 transaction_hash: account_call.transaction_hash,
                 spender: account_call.calldata[0],
                 amount: account_call.calldata[1],
                 timestamp: account_call.timestamp,
                 contract_address: account_call.contract_address,
-                spenderName: spenderName,
-                isContractNameVerified: isContractNameVerified,
               };
-              addItemToErc20(obj);
+              console.log('obj added', obj);
+              updateErc20Map(obj.contract_address.concat(obj.spender), obj);
+              addToAddressSet(obj.contract_address);
             } else {
               //means erc721 single approve
-              const nftData = await fetchData2(
-                `https://api.starkscan.co/api/v0/nft-contract/${account_call.contract_address}`
-              );
-              let spenderName;
-              let isContractNameVerified = false;
-
+              let name = null;
+              let symbol = null;
               try {
-                const contractData = await fetchData2(
-                  `https://api.starkscan.co/api/v0/contract/${account_call.calldata[0]}`
+                const nftData = await fetchData2(
+                  `https://api.starkscan.co/api/v0/nft-contract/${account_call.contract_address}`
                 );
-                spenderName = contractData.name_tag;
-                isContractNameVerified = contractData.is_verified;
+                name = nftData.name;
+                symbol = nftData.symbol;
               } catch (e) {
-                console.log(e);
+                console.error(e);
               }
+
               const obj = {
                 transaction_hash: account_call.transaction_hash,
                 spender: account_call.calldata[0],
@@ -109,29 +114,25 @@ function Home() {
                 timestamp: account_call.timestamp,
                 contract_address: account_call.contract_address,
                 isSetApprovalForAll: false,
-                name: nftData.name,
-                symbol: nftData.symbol,
-                spenderName: spenderName,
-                isContractNameVerified: isContractNameVerified,
+                name: name,
+                symbol: symbol,
               };
-              addItemToErc721(obj);
+              updateErc721Map(obj.contract_address.concat(obj.spender), obj);
+              addToAddressSet(obj.contract_address);
             }
           }
           // means approved for entire collection
           if (account_call.selector_name === 'setApprovalForAll') {
-            const nftData = await fetchData2(
-              `https://api.starkscan.co/api/v0/nft-contract/${account_call.contract_address}`
-            );
-            let spenderName;
-            let isContractNameVerified = false;
+            let name = null;
+            let symbol = null;
             try {
-              const contractData = await fetchData2(
-                `https://api.starkscan.co/api/v0/contract/${account_call.calldata[0]}`
+              const nftData = await fetchData2(
+                `https://api.starkscan.co/api/v0/nft-contract/${account_call.contract_address}`
               );
-              spenderName = contractData.name_tag;
-              isContractNameVerified = contractData.is_verified;
+              name = nftData.name;
+              symbol = nftData.symbol;
             } catch (e) {
-              console.log(e);
+              console.error(e);
             }
 
             const obj = {
@@ -141,16 +142,43 @@ function Home() {
               timestamp: account_call.timestamp,
               contract_address: account_call.contract_address,
               isSetApprovalForAll: true,
-              name: nftData.name,
-              symbol: nftData.symbol,
-              spenderName: spenderName,
-              isContractNameVerified: isContractNameVerified,
+              name: name,
+              symbol: symbol,
             };
-            addItemToErc721(obj);
+            updateErc721Map(obj.contract_address.concat(obj.spender), obj);
+            addToAddressSet(obj.contract_address);
           }
         }
       }
     }
+    Array.from(addressSet).forEach((value) => {
+      console.log(value);
+    });
+    Object.entries(erc20Map).map(([key, value]) => {
+      console.log(key, value);
+    });
+    // console.log(addressSet)
+    // console.log(addressSet.size)
+    // for (const item in addressSet) {
+    //   console.log(item);
+    //   try {
+    //     const contractData = await fetchData2(
+    //       `https://api.starkscan.co/api/v0/contract/${item}`
+    //     );
+    //     console.log(contractData)
+
+    //     updateNameTag(item, {
+    //       isContractNameVerified: contractData.is_verified,
+    //       name: contractData.name_tag,
+    //     });
+    //   } catch (e) {
+    //     console.log(e);
+    //   }
+    // }
+    // console.log("nametag: ",nameTag)
+    // Object.entries(nameTag).forEach(([key, value]) => {
+    //   console.log(key, value);
+    // });
   }
   useEffect(() => {
     async function fetchData() {
@@ -182,13 +210,11 @@ function Home() {
     if (address != undefined && !isFetched) {
       fetchData(), filterAddresses();
     }
-  }, [address, dispatch, filterAddresses, isFetched, transactions]);
+  }, [address, filterAddresses, isFetched, transactions]);
 
   return (
     <div className="px-20">
       <button onClick={filterAddresses}>FILTER</button>
-      {console.log(erc20Addresses)}
-      {console.log(erc721Addresses)}
       <div className="p-10 w-screen flex justify-center">
         <p className="w-1/4">Asset</p>
         <p className="w-1/4">Allowance</p>
@@ -199,116 +225,24 @@ function Home() {
       <div className="p-10 w-screen ">
         <div>ERC20 APPROVES</div>
 
-        {erc20Addresses.map((transaction) => (
-          <div
-            key={transaction.transaction_hash
-              .concat(transaction.spender)
-              .concat(transaction.amount)}
-            className=""
-          >
-            <ul className="py-10 flex gap-2">
-              <li className="w-1/4">
-                <a
-                  href={`https://starkscan.co/contract/${transaction.contract_address}`}
-                >
-                  {transaction.contract_address.substring(0, 4) +
-                    '...' +
-                    transaction.contract_address.substring(
-                      transaction.contract_address.length - 4,
-                      transaction.contract_address.length
-                    )}
-                </a>
-              </li>
-              <li className="w-1/4">
-                {ethers.utils.formatEther(BigNumber.from(transaction.amount))}
-              </li>
-              <li className="w-1/4">
-                <a
-                  href={`https://starkscan.co/contract/${transaction.spender}`}
-                >
-                  {transaction.spenderName !== undefined &&
-                  transaction.isContractNameVerified
-                    ? transaction.spenderName
-                    : transaction.spender.substring(0, 4) +
-                      '...' +
-                      transaction.spender.substring(
-                        transaction.spender.length - 4,
-                        transaction.spender.length
-                      )}
-                </a>
-              </li>
-              <li className="w-1/4">
-                {convertSecondsToDate(transaction.timestamp).toDateString() +
-                  ' '}
-                <p>
-                  {convertSecondsToDate(
-                    transaction.timestamp
-                  ).toLocaleTimeString()}
-                </p>
-              </li>{' '}
-              <li className="w-1/4">
-                <button className="border border-1"> revoke </button>
-                {/* {transaction.contract_address} */}
-              </li>
-            </ul>
-          </div>
+        {Object.entries(erc20Map).map(([key, value]) => (
+          <TransactionComponent
+            key={key}
+            transaction={value}
+            // nameTag={nameTag[value.contract_address]}
+          ></TransactionComponent>
         ))}
       </div>
       <div className="p-10 w-screen ">
         <div>ERC721 APPROVES</div>
-        {erc721Addresses.map((transaction) => (
-          <div
-            key={transaction.transaction_hash
-              .concat(transaction.spender)
-              .concat(transaction.amount)}
-            className=""
-          >
-            <ul className="py-10 flex gap-2">
-              <li className="w-1/4">
-                <a
-                  href={`https://starkscan.co/contract/${transaction.contract_address}`}
-                >
-                  {transaction.name}
-                </a>
-              </li>
-              <li className="w-1/4">
-                {transaction.isSetApprovalForAll
-                  ? 'Unlimited'
-                  : 'Token #' +
-                    BigNumber.from(transaction.tokenId).toNumber().toString()}
-              </li>
-              <li className="w-1/4">
-                <a
-                  href={`https://starkscan.co/contract/${transaction.spender}`}
-                >
-                  {transaction.spenderName !== undefined &&
-                  transaction.isContractNameVerified
-                    ? transaction.spenderName
-                    : transaction.spender.substring(0, 4) +
-                      '...' +
-                      transaction.spender.substring(
-                        transaction.spender.length - 4,
-                        transaction.spender.length
-                      )}
-                </a>
-              </li>
-              <li className="w-1/4">
-                {convertSecondsToDate(transaction.timestamp).toDateString() +
-                  ' '}
-                <p>
-                  {convertSecondsToDate(
-                    transaction.timestamp
-                  ).toLocaleTimeString()}
-                </p>
-              </li>
-              <li className="w-1/4">
-                <button className="border border-1"> revoke </button>
-                {/* {transaction.contract_address} */}
-              </li>
-            </ul>
-          </div>
+        {Object.entries(erc721Map).map(([key, value]) => (
+          <TransactionComponentERC721
+            key={key}
+            transaction={value}
+          ></TransactionComponentERC721>
         ))}
       </div>
+
       <div className="h-screen justify-center flex">
         Made by
         <span>
