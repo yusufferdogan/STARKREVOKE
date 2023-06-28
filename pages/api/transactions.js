@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-// eslint-disable-next-line import/no-anonymous-default-export
-export default async (req, res) => {
+export const fetchTransactions = async (req, res) => {
   const { id } = req.query;
+  console.log('Fetching transaction:', id);
 
   try {
     const response = await axios.get(
-      `https://api-testnet.starkscan.co/collection/1/${id}.json`,
+      `https://api.starkscan.co/api/v0/transactions/${id}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -15,6 +15,7 @@ export default async (req, res) => {
       }
     );
     const data = response.data;
+    console.log('TRANSACTIONS.JS:', data);
 
     // Set the Access-Control-Allow-Origin header to allow requests from any origin
     res.setHeader('Access-Control-Allow-Origin', '*');

@@ -6,13 +6,18 @@ import {
   useContractWrite,
 } from '@starknet-react/core';
 import { ERC20_ABI } from '../../constants/abi';
-import { uint256 } from 'starknet';
+import { uint256, BN } from 'starknet';
 import React from 'react';
+export const UINT_256_MAX = (1n << 256n) - 1n;
+
 function convertSecondsToDate(seconds) {
   const milliseconds = seconds * 1000;
   const date = new Date(milliseconds);
 
   return date;
+}
+export function uint256ToBN(uint256 /*: Uint256*/) {
+  return (BigInt(uint256.high) << 128n) + BigInt(uint256.low);
 }
 export function TransactionComponent({ transaction }) {
   const { address, status } = useAccount();
@@ -37,8 +42,21 @@ export function TransactionComponent({ transaction }) {
   if (isLoading) return <span>Loading...</span>;
   if (error) return <span>Error: {JSON.stringify(error)}</span>;
   if (data === undefined) return <span>data is undefined...</span>;
+  const num = uint256ToBN(transaction.amount);
+  console.log(UINT_256_MAX == num);
 
-  let amount = uint256.uint256ToBN(data?.remaining).toNumber() / 10 ** 18;
+  // let unlimited = amount.gte(ethers.utils.parseEther('100000000000000000000'));
+  // let amount;
+  // if(!unlimited){
+  //   amount = uint256.uint256ToBN(data?.remaining).div(BigNumber.from(ethers.utils.parseEther('1'))).toNumber();
+  // } else {
+  //   amount = ' > 1000';
+  // }
+  // const amount = uint256
+  //   .uint256ToBN(data?.remaining)
+  //   .div(BigNumber.from(ethers.utils.parseEther('1')))
+  //   .toNumber();
+
   // if(amount === 0) return null;
   return (
     <div
@@ -61,7 +79,11 @@ export function TransactionComponent({ transaction }) {
           </a>
         </li>
         <li className="w-1/4">
-          {amount < 0.0001 ? '< 0.0001' : amount.toFixed(4)}
+          {num == UINT_256_MAX
+            ? 'unlimited'
+            : parseFloat(ethers.utils.formatEther(num)) < 0.0001
+            ? '< 0.0001'
+            : parseFloat(ethers.utils.formatEther(num)).toFixed(4).toString()}
         </li>
         <li className="w-1/4">
           <a href={`https://starkscan.co/contract/${transaction.spender}`}>
