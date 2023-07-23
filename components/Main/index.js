@@ -5,180 +5,52 @@ import {
   useConnectors,
   useAccount,
   useContractRead,
+  useBalance,
 } from '@starknet-react/core';
 import { BigNumber, ethers } from 'ethers';
 import { useMemo } from 'react';
 import { TransactionComponent } from './erc20TransactionComponent';
 import { TransactionComponentERC721 } from './erc721TransactionComponent';
 import axios from 'axios';
-import useSWR from 'swr';
-import mockTx from './mockTx.json';
+
 import { uint256 } from 'starknet';
+import { ListItemERC20 } from './listItem';
+import { ListItemERC721 } from './listItemErc721';
+require('dotenv').config();
+const Spinner = () => (
+  <div role="status">
+    <svg
+      aria-hidden="true"
+      className="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+      viewBox="0 0 100 101"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+        fill="currentColor"
+      />
+      <path
+        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+        fill="currentFill"
+      />
+    </svg>
+    <span className="sr-only">Loading...</span>
+  </div>
+);
 
-// const fetchData2 = async (
-//   url = 'https://api.starkscan.co/api/v0/nft-contract/'
-// ) => {
-//   try {
-//     const response = await fetch(url, {
-//       headers: {
-//         accept: 'application/json',
-//         'x-api-key': 'docs-starkscan-co-api-123',
-//       },
-//     });
-
-//     if (response.ok) {
-//       const data = await response.json();
-//       return data;
-//     } else {
-//       throw new Error('Request failed');
-//     }
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
-
+function substr(str) {
+  return (
+    str.substring(0, 4) + '...' + str.substring(str.length - 4, str.length)
+  );
+}
 function Home() {
   const { account, address, status } = useAccount();
-  const [transactions, setTransactions] = useState(mockTx.data);
+  const [transactions, setTransactions] = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
   //erc20 data
-  const [erc20Map, setErc20Map] = useState({
-    '0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac0x41fd22b238fa21cfcf5dd45a8548974d8263b3a531a60388411c5e230f97023':
-      {
-        transaction_hash:
-          '0x025a84a3c6898daf44d953e8ea48e7b3ae6cbd610caa87d6253de9d2416dfd1e',
-        spender:
-          '0x41fd22b238fa21cfcf5dd45a8548974d8263b3a531a60388411c5e230f97023',
-        amount: {
-          low: '0x1b380',
-          high: '0x0',
-        },
-        timestamp: 1687684375,
-        contract_address:
-          '0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac',
-        blockNumber: 89956,
-      },
-    '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc70x7a6f98c03379b9513ca84cca1373ff452a7462a3b61598f0af5bb27ad7f76d1':
-      {
-        transaction_hash:
-          '0x0721c4d308b46ae503e20c39cf728311c522cf3398425aba328879bb7b6ffd1a',
-        spender:
-          '0x7a6f98c03379b9513ca84cca1373ff452a7462a3b61598f0af5bb27ad7f76d1',
-        amount: {
-          low: '0x3ff2e795f50000',
-          high: '0x0',
-        },
-        timestamp: 1687675634,
-        contract_address:
-          '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
-        blockNumber: 89863,
-      },
-    '0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb30x1b23ed400b210766111ba5b1e63e33922c6ba0c45e6ad56ce112e5f4c578e62':
-      {
-        transaction_hash:
-          '0x00ce37a9f639255c53ad62ef256abc24a83464bb51ea15165cddbe866c954be4',
-        spender:
-          '0x1b23ed400b210766111ba5b1e63e33922c6ba0c45e6ad56ce112e5f4c578e62',
-        amount: {
-          low: '0x16765a3bfd95b59ac',
-          high: '0x0',
-        },
-        timestamp: 1685994375,
-        contract_address:
-          '0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3',
-        blockNumber: 73628,
-      },
-    '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc70x1b23ed400b210766111ba5b1e63e33922c6ba0c45e6ad56ce112e5f4c578e62':
-      {
-        transaction_hash:
-          '0x01b0bf7a5039a881c64ac342c56bcba348450a7e12bc4ab67b397e63ce06832f',
-        spender:
-          '0x1b23ed400b210766111ba5b1e63e33922c6ba0c45e6ad56ce112e5f4c578e62',
-        amount: {
-          low: '0xffffffffffffffffffffffffffffffff',
-          high: '0xffffffffffffffffffffffffffffffff',
-        },
-        timestamp: 1685914082,
-        contract_address:
-          '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
-        blockNumber: 72704,
-      },
-    '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc70x10884171baf1914edc28d7afb619b40a4051cfae78a094a55d230f19e944a28':
-      {
-        transaction_hash:
-          '0x0519c16b09549a9917f33ea004dc87e6b5fce89bde37236ecc8fbde1d3e35791',
-        spender:
-          '0x10884171baf1914edc28d7afb619b40a4051cfae78a094a55d230f19e944a28',
-        amount: {
-          low: '0x1dfa2322e15a0',
-          high: '0x0',
-        },
-        timestamp: 1685913957,
-        contract_address:
-          '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
-        blockNumber: 72703,
-      },
-    '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc70x6ac597f8116f886fa1c97a23fa4e08299975ecaf6b598873ca6792b9bbfb678':
-      {
-        transaction_hash:
-          '0x05b348b2a50e73f8d2c77ed857383e892cebaf8496473bd105dacee827add8fd',
-        spender:
-          '0x6ac597f8116f886fa1c97a23fa4e08299975ecaf6b598873ca6792b9bbfb678',
-        amount: {
-          low: '0x2d79883d20000',
-          high: '0x0',
-        },
-        timestamp: 1680960683,
-        contract_address:
-          '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
-        blockNumber: 33939,
-      },
-    '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc70x1bd387d18e52e0a04a87c5f9232e9b3cbd1d630837926e6fece2dea4a65bea9':
-      {
-        transaction_hash:
-          '0x06472886ee006a5d099010b301059532fbc0c15fe08b5030b92bb321c417e33b',
-        spender:
-          '0x1bd387d18e52e0a04a87c5f9232e9b3cbd1d630837926e6fece2dea4a65bea9',
-        amount: {
-          low: '0x354a6ba7a18000',
-          high: '0x0',
-        },
-        timestamp: 1683490713,
-        contract_address:
-          '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
-        blockNumber: 49525,
-      },
-    '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc70x88b0a6e4eaa5b05247d79c6a63b75d9829a28a4ff2f37a021c59cc241cd324':
-      {
-        transaction_hash:
-          '0x04cef34b08a7c7738d9924a0d6480cadfa14294a2c22f34f047b3ad9ef1a929a',
-        spender:
-          '0x88b0a6e4eaa5b05247d79c6a63b75d9829a28a4ff2f37a021c59cc241cd324',
-        amount: {
-          low: '0x254db1c2244000',
-          high: '0x0',
-        },
-        timestamp: 1683058460,
-        contract_address:
-          '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
-        blockNumber: 47958,
-      },
-    '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc70x79b882cb8200c1c1d20e849a2ef19124b0b8985358c1313ea6af588cfe4fec8':
-      {
-        transaction_hash:
-          '0x00d16c9fb4bf606a7c737aea0594db71b415b2aa90c2399f01a43438729b5ca7',
-        spender:
-          '0x79b882cb8200c1c1d20e849a2ef19124b0b8985358c1313ea6af588cfe4fec8',
-        amount: {
-          low: '0x5d423c655aa0000',
-          high: '0x0',
-        },
-        timestamp: 1680912616,
-        contract_address:
-          '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
-        blockNumber: 33378,
-      },
-  });
+  const [erc20Map, setErc20Map] = useState({});
+  const [loading, setIsLoading] = useState(false);
   const updateErc20Map = (key, value) => {
     setErc20Map((prevMap) => ({
       ...prevMap,
@@ -202,7 +74,6 @@ function Home() {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   async function filterAddresses() {
-    console.log('filterAddresses', transactions);
     for (let i = 0; i < transactions.length; i++) {
       const element = transactions[i];
       if (element.account_calls.length > 0) {
@@ -260,97 +131,93 @@ function Home() {
         }
       }
     }
+    setIsLoading(false);
   }
 
-  // const API_KEY = 'docs-starkscan-co-api-123'; // Replace with your actual API key
+  useEffect(() => {
+    const fetcher = async (url) => {
+      try {
+        const response = await axios.get(url, {
+          headers: {
+            Accept: 'application/json',
+            'x-api-key': process.env.API_KEY,
+          },
+        });
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching resource:', error);
+        throw new Error('Error fetching resource');
+      }
+    };
+    const fetchTransactions = async () => {
+      setIsLoading(true);
+      try {
+        if (address !== undefined && !isLoaded) {
+          const response = await fetcher(
+            `https://api.starkscan.co/api/v0/transactions?contract_address=${address}&limit=100`
+          );
+          setTransactions(response.data);
+          setIsLoaded(true);
+          return response;
+        }
+      } catch (error) {
+        console.error('Error fetching resource:', error);
+        throw new Error('Error fetching resource');
+      }
+    };
+    if (address !== undefined && !isLoaded) {
+      fetchTransactions().then(() => filterAddresses());
+    }
+  }, [address, filterAddresses, isLoaded, transactions]);
 
-  // const fetcher = async (url) => {
-  //   try {
-  //     const response = await axios.get(url, {
-  //       headers: {
-  //         Accept: 'application/json',
-  //         'x-api-key': API_KEY,
-  //       },
-  //     });
-  //     return response.data;
-  //   } catch (error) {
-  //     console.error('Error fetching resource:', error);
-  //     throw new Error('Error fetching resource');
-  //   }
-  // };
-
-  // const fetchTransactions = async () => {
-  //   try {
-  //     if (address !== undefined && !isLoaded) {
-  //       const response = await fetcher(
-  //         `https://api.starkscan.co/api/v0/transactions?contract_address=${address}`
-  //       );
-  //       console.log('response:',response);
-  //       setTransactions(response.data);
-  //       return response;
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching resource:', error);
-  //     throw new Error('Error fetching resource');
-  //   }
-  // };
-
-  // const { data, error } = useSWR(address, fetchTransactions);
-  function print() {
-    // erc20Map.forEach((value, key) => {
-    //   console.log(key, value);
-    // });
-    console.log(erc20Map);
-    // console.log(transactions)
-  }
   return (
     <div className="px-20">
-      {/* <button className="pr-5" onClick={fetchTransactions}>
-        FETCH
-      </button> */}
-      <button onClick={filterAddresses}>FILTER</button>
-      <button className="pl-5" onClick={print}>
-        PRINT
-      </button>
-      <div className="p-10 w-screen flex justify-center">
-        <p className="w-1/4">Asset</p>
-        <p className="w-1/4">Allowance</p>
-        <p className="w-1/4">Spender</p>
-        <p className="w-1/4">Last Updated</p>
-        <p className="w-1/4">Actions</p>
-      </div>
-      <div className="p-10 w-screen ">
-        <div>ERC20 APPROVES</div>
+      {loading ? (
+        <div
+          className="inline-block h-8 w-8 animate-[spinner-grow_0.75s_linear_infinite] rounded-full bg-current align-[-0.125em] text-primary opacity-0 motion-reduce:animate-[spinner-grow_1.5s_linear_infinite]"
+          role="status"
+        >
+          <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+            Loading...
+          </span>
+        </div>
+      ) : (
+        <div className="relative overflow-x-auto shadow-md sm:rounded-lg border mx-20 rounded-lg  ">
+          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead className="font-bold text-white uppercase dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" className="px-6 py-3 ">
+                  Asset
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Allowance
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Spender
+                </th>{' '}
+                <th scope="col" className="px-6 py-3">
+                  Last Updated
+                </th>{' '}
+                <th scope="col" className="px-6 py-3">
+                  Type
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(erc20Map).map(([key, value]) => (
+                <ListItemERC20 key={key} transaction={value}></ListItemERC20>
+              ))}
+              {Object.entries(erc721Map).map(([key, value]) => (
+                <ListItemERC721 key={key} transaction={value}></ListItemERC721>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-        {Object.entries(erc20Map).map(([key, value]) => (
-          <TransactionComponent
-            key={key}
-            transaction={value}
-            // nameTag={nameTag[value.contract_address]}
-          ></TransactionComponent>
-        ))}
-      </div>
-      <div className="p-10 w-screen ">
-        <div>ERC721 APPROVES</div>
-        {Object.entries(erc721Map).map(([key, value]) => (
-          <TransactionComponentERC721
-            key={key}
-            transaction={value}
-          ></TransactionComponentERC721>
-        ))}
-      </div>
-
-      <div className="h-screen justify-center flex">
-        Made by
-        <span>
-          <a
-            href="https://github.com/yusufferdogan"
-            className="text-sky-400 font-extrabold"
-          >
-            &nbsp;@yusufferdogan
-          </a>
-        </span>
-      </div>
       <MyFooter></MyFooter>
     </div>
   );

@@ -1,8 +1,6 @@
 import '../styles/globals.css';
 import { useState, useEffect } from 'react';
 import { StarknetConfig, InjectedConnector } from '@starknet-react/core';
-import { Provider } from 'react-redux';
-import store from '../pages/store';
 const connectors = [
   new InjectedConnector({ options: { id: 'braavos' } }),
   new InjectedConnector({ options: { id: 'argentX' } }),
@@ -13,11 +11,9 @@ function MyApp({ Component, pageProps }) {
   if (!mounted) return null;
 
   return (
-    <Provider store={store}>
       <StarknetConfig connectors={connectors}>
         <Component {...pageProps} />
       </StarknetConfig>
-    </Provider>
   );
 }
 

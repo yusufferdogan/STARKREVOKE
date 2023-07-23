@@ -2,27 +2,22 @@ import React from 'react';
 import Link from 'next/link';
 import { ConnectWallet } from './utils';
 import Image from 'next/image';
+import Logo from '../../constants/images/logo.svg';
 
 function Header() {
   return (
     <header aria-label="Site Header">
-      <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 items-center">
-        <div className="flex h-16 items-center justify-between ">
+      <div className="mx-auto max-w-screen-3xl px-4 sm:px-6 lg:px-8 items-center">
+        <div className="flex h-16 items-center justify-between">
           <div className="md:flex md:items-center md:gap-12">
             <Link href="/">
-              <div className="block text-teal-600">
+              <div className="block text-white font-extrabold text-3xl">
                 <span className="sr-only">Home</span>
-                <Image
-                  src="https://ik.imagekit.io/bayc/assets/bayc-logo-z.png"
-                  alt="BayC logo"
-                  width={180}
-                  height={70}
-                  layout="fixed"
-                />
+                <p>Revoke Starknet</p>
               </div>
             </Link>
           </div>
-          <div className="hidden md:block">
+          {/* <div className="hidden md:block">
             <nav aria-label="Site Nav">
               <ul className="flex items-center gap-6 text-sm">
                 <li>
@@ -59,7 +54,7 @@ function Header() {
                 </li>
               </ul>
             </nav>
-          </div>
+          </div> */}
           <div className="flex items-center">
             <div className="">
               <ConnectWallet></ConnectWallet>

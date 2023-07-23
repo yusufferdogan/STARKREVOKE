@@ -15,6 +15,7 @@
     "@starknet-react/core": "^0.16.0",
     "axios": "^1.4.0",
     "classnames": "^2.3.2",
+    "dotenv": "^16.3.1",
     "get-starknet": "^2.0.0",
     "next": "^12.1.6",
     "next-themes": "^0.2.1",
