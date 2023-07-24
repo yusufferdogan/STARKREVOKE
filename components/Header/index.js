@@ -7,13 +7,13 @@ import Logo from '../../constants/images/logo.svg';
 function Header() {
   return (
     <header aria-label="Site Header">
-      <div className="mx-auto max-w-screen-3xl px-4 sm:px-6 lg:px-8 items-center">
+      <div className="mx-auto max-w-screen-3xl px-4 sm:px-6 lg:px-8 items-center pb-10">
         <div className="flex h-16 items-center justify-between">
           <div className="md:flex md:items-center md:gap-12">
             <Link href="/">
               <div className="block text-white font-extrabold text-3xl">
                 <span className="sr-only">Home</span>
-                <p>Revoke Starknet</p>
+                <p className='pl-10'>Revoke Starknet</p>
               </div>
             </Link>
           </div>
@@ -56,7 +56,7 @@ function Header() {
             </nav>
           </div> */}
           <div className="flex items-center">
-            <div className="">
+            <div className="pr-10">
               <ConnectWallet></ConnectWallet>
             </div>
           </div>

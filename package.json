@@ -13,6 +13,7 @@
     "@nextui-org/react": "latest",
     "@reduxjs/toolkit": "^1.9.5",
     "@starknet-react/core": "^0.16.0",
+    "api": "^6.1.0",
     "axios": "^1.4.0",
     "classnames": "^2.3.2",
     "dotenv": "^16.3.1",

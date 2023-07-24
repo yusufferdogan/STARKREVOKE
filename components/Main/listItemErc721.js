@@ -1,5 +1,14 @@
-import React from 'react';
 import { BigNumber, ethers, constants } from 'ethers';
+import {
+  useContractRead,
+  useAccount,
+  useContractWrite,
+} from '@starknet-react/core';
+import React from 'react';
+import { useMemo } from 'react';
+import { uint256 } from 'starknet';
+import { ERC721_ABI } from '../../constants/abi';
+import { Spinner } from './spinner';
 
 function convertSecondsToDate(seconds) {
   const milliseconds = seconds * 1000;
@@ -15,6 +24,46 @@ function substr(str) {
   );
 }
 export function ListItemERC721({ transaction }) {
+  const { address, status } = useAccount();
+  const { data, isLoading, error, refetch } = useContractRead({
+    address: transaction.contract_address,
+    abi: ERC721_ABI.abi,
+    functionName: 'allowance',
+    args: [address, transaction.spender],
+    watch: false,
+  });
+  const calls_approve = useMemo(() => {
+    const tx = {
+      contractAddress: transaction.contract_address,
+      entrypoint: 'approve',
+      calldata: [0, transaction.tokenId, 0],
+    };
+    return Array(1).fill(tx);
+  }, [transaction.contract_address, transaction.tokenId]);
+
+  const { write: approveWrite } = useContractWrite({ calls: calls_approve });
+
+  const calls_setApproveForAll = useMemo(() => {
+    const tx = {
+      contractAddress: transaction.contract_address,
+      entrypoint: 'setApprovalForAll',
+      calldata: [transaction.spender, 0],
+    };
+    return Array(1).fill(tx);
+  }, [transaction.contract_address, transaction.spender]);
+
+  const { write: setApproveForAllWrite } = useContractWrite({
+    calls: calls_setApproveForAll,
+  });
+
+  if (isLoading)
+    return (
+      <tr>
+        <td></td> <td></td> <td>{/* <Spinner></Spinner> */}</td> <td></td>{' '}
+        <td></td>
+        <td></td>
+      </tr>
+    );
   return (
     <tr
       key={transaction.transaction_hash
@@ -27,6 +76,7 @@ export function ListItemERC721({ transaction }) {
         scope="row"
         className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="w-10 h-10 rounded-full"
           src="https://img.freepik.com/free-vector/nft-non-fungible-token-concept-with-neon-light-effect_1017-41102.jpg?w=826&t=st=1688758281~exp=1688758881~hmac=5c3f52f5944d46cd5b23b5bb89ac3524dfaec2fe4f05f953f81075cefce20863"
@@ -70,6 +120,11 @@ export function ListItemERC721({ transaction }) {
       </td>
       <td className="px-6 py-4">
         <button
+          onClick={
+            transaction.isSetApprovalForAll
+              ? setApproveForAllWrite
+              : approveWrite
+          }
           type="button"
           className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
         >

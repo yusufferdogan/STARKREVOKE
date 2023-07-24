@@ -1,4 +1,15 @@
 import React from 'react';
+import { useMemo, useState } from 'react';
+import { BigNumber, ethers } from 'ethers';
+import { Spinner } from './spinner';
+import {
+  useContractRead,
+  useAccount,
+  useContractWrite,
+} from '@starknet-react/core';
+import { ERC20_ABI } from '../../constants/abi';
+export const UINT_256_MAX =
+  115792089237316195423570985008687907853269984665640564039457584007913129639935n;
 function convertSecondsToDate(seconds) {
   const milliseconds = seconds * 1000;
   const date = new Date(milliseconds);
@@ -34,6 +45,39 @@ const decimal = {
   '0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac': 8,
 };
 export function ListItemERC20({ transaction }) {
+  const { address, status } = useAccount();
+  const [amount, setAmount] = useState(0);
+  const { data, isLoading, error, refetch } = useContractRead({
+    address: transaction.contract_address,
+    abi: ERC20_ABI.abi,
+    functionName: 'allowance',
+    args: [address, transaction.spender],
+    watch: true,
+  });
+  const calls = useMemo(() => {
+    const tx = {
+      contractAddress: transaction.contract_address,
+      entrypoint: 'approve',
+      calldata: [transaction.spender, 0, 0],
+    };
+    return Array(1).fill(tx);
+  }, [transaction.contract_address, transaction.spender]);
+
+  const { write } = useContractWrite({ calls });
+
+  if (isLoading)
+    return (
+      <tr>
+        <td></td> <td></td> <td>{/* <Spinner></Spinner> */}</td> <td></td>{' '}
+        <td></td>
+        <td></td>
+      </tr>
+    );
+  if (error) return <span>Error: {JSON.stringify(error)}</span>;
+  if (data === undefined) return <span>data is undefined...</span>;
+  const num = BigInt(uint256ToBN(data?.remaining));
+  if (num === 0n) return null;
+
   return (
     <tr
       className="border-b dark:bg-gray-800 dark:border-gray-700
@@ -43,6 +87,7 @@ export function ListItemERC20({ transaction }) {
         scope="row"
         className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="w-10 h-10 rounded-full"
           src={icon[transaction?.contract_address]}
@@ -61,28 +106,14 @@ export function ListItemERC20({ transaction }) {
         </a>
       </th>
       <td className="px-6 py-4 text-white">
-        {console.log(
-          'transaction.amount: ',
-          BigInt(uint256ToBN(transaction.amount))
-        )}{' '}
-        {console.log(
-          'decimal: ',
-          BigInt(10 ** decimal[transaction.contract_address])
-        )}
-        {(
-          parseFloat(BigInt(uint256ToBN(transaction.amount))) /
-          parseFloat(BigInt(10 ** decimal[transaction.contract_address]))
-        )
-          .toFixed(4)
-          .toString()}
-        {/* {BigInt(num) >= UINT_256_MAX
+        {BigInt(num) >= UINT_256_MAX
           ? 'unlimited'
           : parseFloat(ethers.utils.formatEther(num)) > 100000
           ? '> 100000'
           : parseFloat(ethers.utils.formatEther(num)) < 0.0001
           ? '< 0.0001'
           : parseFloat(ethers.utils.formatEther(num)).toFixed(4).toString()}
- */}
+
         <span>
           &nbsp;&nbsp;
           {currency[transaction.contract_address] === undefined
@@ -113,6 +144,7 @@ export function ListItemERC20({ transaction }) {
       </td>
       <td className="px-6 py-4">
         <button
+          onClick={write}
           type="button"
           className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
         >
