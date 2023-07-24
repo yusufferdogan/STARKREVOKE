@@ -77,7 +77,7 @@ export function ListItemERC20({ transaction }) {
   if (data === undefined) return <span>data is undefined...</span>;
   const num = BigInt(uint256ToBN(data?.remaining));
   if (num === 0n) return null;
-
+  const date = convertSecondsToDate(transaction.timestamp);
   return (
     <tr
       className="border-b dark:bg-gray-800 dark:border-gray-700
@@ -132,7 +132,7 @@ export function ListItemERC20({ transaction }) {
         </a>
       </td>{' '}
       <td className="px-6 py-4 text-white">
-        {convertSecondsToDate(transaction.timestamp).toDateString() + ' '}
+        {date.toDateString()}
         <p>
           {convertSecondsToDate(transaction.timestamp).toLocaleTimeString()}
         </p>
