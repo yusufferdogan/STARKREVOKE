@@ -3,17 +3,19 @@ import Link from 'next/link';
 import { ConnectWallet } from './utils';
 import Image from 'next/image';
 import Logo from '../../constants/images/logo.svg';
+import { ToastContainer, toast } from 'react-toastify';
 
 function Header() {
   return (
     <header aria-label="Site Header">
+      <ToastContainer autoClose={false} draggable={false} />
       <div className="mx-auto max-w-screen-3xl px-4 sm:px-6 lg:px-8 items-center pb-10">
         <div className="flex h-16 items-center justify-between">
           <div className="md:flex md:items-center md:gap-12">
             <Link href="/">
               <div className="block text-white font-extrabold text-3xl">
                 <span className="sr-only">Home</span>
-                <p className='pl-10'>Revoke Starknet</p>
+                <p className="pl-10">Revoke Starknet</p>
               </div>
             </Link>
           </div>
