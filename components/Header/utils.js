@@ -102,7 +102,7 @@ export function OpenModal({ available, connect, connectors }) {
                         className="px-10"
                       />
                       <p>
-                        {isWalletAvailable('bravoos', available)
+                        {isWalletAvailable('braavos', available)
                           ? 'Connect to Bravoos'
                           : 'Install Bravoos'}
                       </p>
