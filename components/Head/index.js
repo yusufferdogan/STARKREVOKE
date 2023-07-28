@@ -5,8 +5,8 @@ export function CustomHead(params) {
   return (
     <Head>
       <title>STARKNET-REACT-BOILERPLATE</title>
-      <meta name="description" content="STARKNET-REACT-BOILERPLATE" />
-      <link rel="icon" href="/favicon.ico" />
+      <meta name="description" content="REVOKE.STARKNET" />
+      <link rel="icon" href="favicon.ico" />
     </Head>
   );
 }
