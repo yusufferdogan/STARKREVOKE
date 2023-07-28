@@ -65,14 +65,7 @@ export function ListItemERC20({ transaction }) {
 
   const { write } = useContractWrite({ calls });
 
-  if (isLoading)
-    return (
-      <tr>
-        <td></td> <td></td> <td>{/* <Spinner></Spinner> */}</td> <td></td>{' '}
-        <td></td>
-        <td></td>
-      </tr>
-    );
+  if (isLoading) return null;
   if (error) return <span>Error: {JSON.stringify(error)}</span>;
   if (data === undefined) return <span>data is undefined...</span>;
   const num = BigInt(uint256ToBN(data?.remaining));
