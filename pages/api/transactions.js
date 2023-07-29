@@ -13,8 +13,8 @@ export default async function handler(req, res) {
 
   const data = [];
   let counter = 1;
+  let next_url = null;
   try {
-    let next_url = null;
     do {
       console.log('sending req:', counter);
       counter++;
@@ -30,7 +30,8 @@ export default async function handler(req, res) {
       console.log("response.next_url:", response.next_url)
       console.log("response:", response)
 
-      next_url = response.next_url;
+      next_url = response.next_url
+
       if (response.next_url) {
         const searching_url = new URL(response.next_url);
         const searchParams = searching_url.searchParams;
@@ -58,7 +59,7 @@ export default async function handler(req, res) {
       console.log('response.data.data.length:', response.data.data.length);
 
       if (response.next_url) await sleep(1000);
-    } while (response.next_url);
+    } while (next_url);
 
     console.log('Data.length:', data.length);
 
