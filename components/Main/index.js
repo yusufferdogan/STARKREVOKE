@@ -106,16 +106,23 @@ function Home() {
     const fetchDataAndFilterAddresses = async (
       address,
       isLoaded,
+      setIsLoading
     ) => {
       if (address && !isLoaded) {
-        // Call fetchData() and wait for it to complete before calling filterAddresses()
-        await fetchData();
-        await sleep(2000); // Wait for 2 seconds
-        filterAddresses();
-        setIsLoaded(true);
+        setIsLoading(true);
+        try {
+          await fetchData();
+          // await sleep(1000);
+          filterAddresses();
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        } finally {
+          setIsLoading(false);
+          setIsLoaded(true);
+        }
       }
     };
-    // Function to fetch data
+
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/transactions?id=${address}`);
@@ -124,14 +131,13 @@ function Home() {
         }
         const data = await response.json();
         setTransactions(data);
-        console.log('data', data);
+        console.log('Transactions', data);
       } catch (error) {
-        setIsLoaded(true);
+        throw new Error('Error fetching data: ' + error.message);
       }
     };
 
-    // Call the fetchData function when the component mounts
-    fetchDataAndFilterAddresses(address, isLoaded);
+    fetchDataAndFilterAddresses(address, isLoaded, setIsLoading);
   }, [address, filterAddresses, isLoaded]); // Empty dependency array ensures this effect runs only once, when the component mounts
 
   return (
