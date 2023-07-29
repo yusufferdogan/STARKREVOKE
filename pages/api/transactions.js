@@ -14,8 +14,11 @@ export default async function handler(req, res) {
 
     const data = [];
     const params = { contract_address, limit };
-
+    let next_url = null;
+    let counter = 1;
     do {
+      console.log("sending req:" , counter);
+      counter++;
       const startTime = new Date().getTime();
 
       const response = await axios.get(url, {
@@ -23,15 +26,20 @@ export default async function handler(req, res) {
         params: params,
       });
 
-      url = response.next_url;
-      const searching_url = new URL(url);
-      const searchParams = searching_url.searchParams;
-      const cursor = searchParams.get('cursor'); // 'value1'
-      if (cursor) {
-        params.cursor = cursor;
+      if (response.next_url) {
+        const searching_url = new URL(response.next_url);
+        const searchParams = searching_url.searchParams;
+        const cursor = searchParams.get('cursor'); // 'value1'
+        if (cursor) {
+          params.cursor = cursor;
+        }
+        next_url = response.next_url;
+      } else {
+        next_url = null;
       }
 
-      data.push(...response.data);
+      data.concat(response.data.data);
+      console.log("data.length: ",data.length);
 
       const endTime = new Date().getTime();
 
@@ -40,11 +48,13 @@ export default async function handler(req, res) {
 
       console.log('Time Elapsed (ms):', timeElapsed);
 
-      console.log('Data:', response.data);
-      console.log('next_url:', response.next_url);
+      console.log('next_url:', next_url);
+      console.log('response.data.data.length:', response.data.data.length);
 
-      if (response.next_url) await sleep(1000);
-    } while (url != null);
+      if (next_url != null) await sleep(1000);
+    } while (next_url != null);
+
+    console.log('Data:', data);
 
     // Set the Access-Control-Allow-Origin header to allow requests from any origin
     res.setHeader('Access-Control-Allow-Origin', '*');

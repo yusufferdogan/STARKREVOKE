@@ -100,7 +100,7 @@ function Home() {
     }
   }
   function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
   useEffect(() => {
     const fetchDataAndFilterAddresses = async (
@@ -112,7 +112,7 @@ function Home() {
         setIsLoading(true);
         // Call fetchData() and wait for it to complete before calling filterAddresses()
         await fetchData();
-        await sleep(200); // Wait for 2 seconds
+        await sleep(2000); // Wait for 2 seconds
         filterAddresses();
         setIsLoading(false);
         setIsLoaded(true);
@@ -126,8 +126,9 @@ function Home() {
           throw new Error('Request failed');
         }
         const data = await response.json();
-        setTransactions(data.data);
-        console.log('Transactions', data.data);
+        setTransactions(data);
+        console.log('Transactions', data);
+        console.log('data', data);
       } catch (error) {
         setIsLoading(false);
         setIsLoaded(true);
@@ -136,11 +137,10 @@ function Home() {
 
     // Call the fetchData function when the component mounts
     fetchDataAndFilterAddresses(address, isLoaded, setIsLoading);
-  }, [address, filterAddresses, isLoaded]); // Empty dependency array ensures this effect runs only once, when the component mounts
+  }, [address, isLoaded]); // Empty dependency array ensures this effect runs only once, when the component mounts
 
   return (
     <div className="px-20">
-      {console.log('erc20Map', erc20Map)}
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg border mx-20 rounded-lg  ">
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
           <thead className="font-bold text-white uppercase dark:bg-gray-700 dark:text-gray-400">
