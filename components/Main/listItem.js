@@ -69,7 +69,7 @@ export function ListItemERC20({ transaction }) {
   if (error) return <span>Error: {JSON.stringify(error)}</span>;
   if (data === undefined) return <span>data is undefined...</span>;
   const num = BigInt(uint256ToBN(data?.remaining));
-  if (num === 0n) return null;
+  // if (num === 0n) return null;
   const date = convertSecondsToDate(transaction.timestamp);
   return (
     <tr
