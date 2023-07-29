@@ -106,15 +106,12 @@ function Home() {
     const fetchDataAndFilterAddresses = async (
       address,
       isLoaded,
-      setIsLoading
     ) => {
       if (address && !isLoaded) {
-        setIsLoading(true);
         // Call fetchData() and wait for it to complete before calling filterAddresses()
         await fetchData();
         await sleep(2000); // Wait for 2 seconds
         filterAddresses();
-        setIsLoading(false);
         setIsLoaded(true);
       }
     };
@@ -127,17 +124,15 @@ function Home() {
         }
         const data = await response.json();
         setTransactions(data);
-        console.log('Transactions', data);
         console.log('data', data);
       } catch (error) {
-        setIsLoading(false);
         setIsLoaded(true);
       }
     };
 
     // Call the fetchData function when the component mounts
-    fetchDataAndFilterAddresses(address, isLoaded, setIsLoading);
-  }, [address, isLoaded]); // Empty dependency array ensures this effect runs only once, when the component mounts
+    fetchDataAndFilterAddresses(address, isLoaded);
+  }, [address, filterAddresses, isLoaded]); // Empty dependency array ensures this effect runs only once, when the component mounts
 
   return (
     <div className="px-20">
