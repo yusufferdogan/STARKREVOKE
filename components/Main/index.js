@@ -12,7 +12,7 @@ import { ListItemERC721 } from './listItemErc721';
 require('dotenv').config();
 function Home() {
   const { account, address, status } = useAccount();
-  const [transactions, setTransactions] = useState({});
+  // const [transactions, setTransactions] = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
   //erc20 data
   const [erc20Map, setErc20Map] = useState({});
@@ -38,41 +38,60 @@ function Home() {
     setAddressSet((prevSet) => new Set([...prevSet, value]));
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  async function filterAddresses() {
-    console.log('filterAddresses:', transactions);
-    for (let i = 0; i < transactions.length; i++) {
-      const element = transactions[i];
-      if (element.account_calls.length > 0) {
-        for (let j = 0; j < element.account_calls.length; j++) {
-          const account_call = element.account_calls[j];
-          if (account_call.selector_name === 'approve') {
-            // if result is 0x1 it means true and it is erc20 approve
-            if (
-              account_call.result.length > 0 &&
-              account_call.result[0] === '0x1'
-            ) {
-              const obj = {
-                transaction_hash: account_call.transaction_hash,
-                spender: account_call.calldata[0],
-                amount: {
-                  low: account_call.calldata[1],
-                  high: account_call.calldata[2],
-                },
-                timestamp: account_call.timestamp,
-                contract_address: account_call.contract_address,
-                blockNumber: account_call.block_number,
-              };
-              updateErc20Map(obj.contract_address.concat(obj.spender), obj);
-              addToAddressSet(obj.contract_address);
-            } else {
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+  useEffect(() => {
+    async function filterAddresses(transactions) {
+      console.log('filterAddresses:', transactions);
+      for (let i = 0; i < transactions.length; i++) {
+        const element = transactions[i];
+        if (element.account_calls.length > 0) {
+          for (let j = 0; j < element.account_calls.length; j++) {
+            const account_call = element.account_calls[j];
+            if (account_call.selector_name === 'approve') {
+              // if result is 0x1 it means true and it is erc20 approve
+              if (
+                account_call.result.length > 0 &&
+                account_call.result[0] === '0x1'
+              ) {
+                const obj = {
+                  transaction_hash: account_call.transaction_hash,
+                  spender: account_call.calldata[0],
+                  amount: {
+                    low: account_call.calldata[1],
+                    high: account_call.calldata[2],
+                  },
+                  timestamp: account_call.timestamp,
+                  contract_address: account_call.contract_address,
+                  blockNumber: account_call.block_number,
+                };
+                updateErc20Map(obj.contract_address.concat(obj.spender), obj);
+                addToAddressSet(obj.contract_address);
+              } else {
+                const obj = {
+                  transaction_hash: account_call.transaction_hash,
+                  spender: account_call.calldata[0],
+                  tokenId: account_call.calldata[1],
+                  timestamp: account_call.timestamp,
+                  contract_address: account_call.contract_address,
+                  isSetApprovalForAll: false,
+                  name: null,
+                  symbol: null,
+                };
+                updateErc721Map(obj.contract_address.concat(obj.spender), obj);
+                addToAddressSet(obj.contract_address);
+              }
+            }
+            // means approved for entire collection
+            if (account_call.selector_name === 'setApprovalForAll') {
               const obj = {
                 transaction_hash: account_call.transaction_hash,
                 spender: account_call.calldata[0],
                 tokenId: account_call.calldata[1],
                 timestamp: account_call.timestamp,
                 contract_address: account_call.contract_address,
-                isSetApprovalForAll: false,
+                isSetApprovalForAll: true,
                 name: null,
                 symbol: null,
               };
@@ -80,42 +99,29 @@ function Home() {
               addToAddressSet(obj.contract_address);
             }
           }
-          // means approved for entire collection
-          if (account_call.selector_name === 'setApprovalForAll') {
-            const obj = {
-              transaction_hash: account_call.transaction_hash,
-              spender: account_call.calldata[0],
-              tokenId: account_call.calldata[1],
-              timestamp: account_call.timestamp,
-              contract_address: account_call.contract_address,
-              isSetApprovalForAll: true,
-              name: null,
-              symbol: null,
-            };
-            updateErc721Map(obj.contract_address.concat(obj.spender), obj);
-            addToAddressSet(obj.contract_address);
-          }
         }
       }
     }
-  }
-  function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-  useEffect(() => {
     const fetchDataAndFilterAddresses = async (
       address,
       isLoaded,
+      setIsLoading
     ) => {
       if (address && !isLoaded) {
-        // Call fetchData() and wait for it to complete before calling filterAddresses()
-        await fetchData();
-        await sleep(2000); // Wait for 2 seconds
-        filterAddresses();
-        setIsLoaded(true);
+        setIsLoading(true);
+        try {
+          const data = await fetchData();
+          console.log('fetchDataAndFilterAddresses', data);
+          if (data) filterAddresses(data);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        } finally {
+          setIsLoading(false);
+          setIsLoaded(true);
+        }
       }
     };
-    // Function to fetch data
+
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/transactions?id=${address}`);
@@ -123,17 +129,17 @@ function Home() {
           throw new Error('Request failed');
         }
         const data = await response.json();
-        setTransactions(data);
-        console.log('data', data);
+        // setTransactions(data);
+        return data;
       } catch (error) {
-        setIsLoaded(true);
+        throw new Error('Error fetching data: ' + error.message);
       }
     };
 
-    // Call the fetchData function when the component mounts
-    fetchDataAndFilterAddresses(address, isLoaded);
-  }, [address, filterAddresses, isLoaded]); // Empty dependency array ensures this effect runs only once, when the component mounts
-
+    fetchDataAndFilterAddresses(address, isLoaded, setIsLoading);
+  }, [address, isLoaded]); // Empty dependency array ensures this effect runs only once, when the component mounts
+  console.log("20:",erc20Map);
+  console.log("721:",erc721Map);
   return (
     <div className="px-20">
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg border mx-20 rounded-lg  ">

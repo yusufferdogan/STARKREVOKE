@@ -1,4 +1,5 @@
 import axios from 'axios';
+import mockData from "../../constants/mockTx.json"
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -13,7 +14,6 @@ export default async function handler(req, res) {
 
   const data = [];
   let counter = 1;
-  let next_url = null;
   try {
     do {
       console.log('sending req:', counter);
@@ -25,21 +25,20 @@ export default async function handler(req, res) {
       const response = await axios.get(url, {
         headers,
         params: params,
+        order_by: 'asc'
       });
 
-      console.log("response.next_url:", response.next_url)
-      console.log("response:", response)
+      console.log("response.next_url:", response.data.next_url)
+      // console.log("response:", response)
 
-      next_url = response.next_url
-
-      if (response.next_url) {
-        const searching_url = new URL(response.next_url);
+      if (response.data.next_url) {
+        const searching_url = new URL(response.data.next_url);
         const searchParams = searching_url.searchParams;
         const cursor = searchParams.get('cursor'); // 'value1'
         if (cursor) {
           params.cursor = cursor;
         }
-      } 
+      }
 
       for (let index = 0; index < response.data.data.length; index++) {
         const element = response.data.data[index];
@@ -58,8 +57,9 @@ export default async function handler(req, res) {
 
       console.log('response.data.data.length:', response.data.data.length);
 
-      if (response.next_url) await sleep(1000);
-    } while (next_url);
+      if (response.data.next_url) await sleep(1000);
+      if (response.data.next_url) break;
+    } while (1);
 
     console.log('Data.length:', data.length);
 
@@ -67,6 +67,7 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
 
     // Return the resource data as a JSON response
+    console.log("REQUESTED");
     res.status(200).json(data);
   } catch (error) {
     console.error('Error fetching resource:', error);
