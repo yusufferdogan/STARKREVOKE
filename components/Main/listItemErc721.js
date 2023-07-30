@@ -9,7 +9,7 @@ import { useMemo } from 'react';
 import { uint256 } from 'starknet';
 import { ERC721_ABI } from '../../constants/abi';
 import { Spinner } from './spinner';
-
+import { nftData } from '../../constants/nftData';
 function convertSecondsToDate(seconds) {
   const milliseconds = seconds * 1000;
   const date = new Date(milliseconds);
@@ -24,6 +24,10 @@ function substr(str) {
   );
 }
 export function ListItemERC721({ transaction }) {
+  const targetNft = nftData.find(
+    (nft) => nft.contract_address === transaction.contract_address
+  );
+
   const { address, status } = useAccount();
   const { data, isLoading, error, refetch } = useContractRead({
     address: transaction.contract_address,
@@ -56,14 +60,8 @@ export function ListItemERC721({ transaction }) {
     calls: calls_setApproveForAll,
   });
 
-  if (isLoading)
-    return (
-      <tr>
-        <td></td> <td></td> <td>{/* <Spinner></Spinner> */}</td> <td></td>{' '}
-        <td></td>
-        <td></td>
-      </tr>
-    );
+  if (isLoading) return null;
+
   return (
     <tr
       key={transaction.transaction_hash
@@ -76,19 +74,27 @@ export function ListItemERC721({ transaction }) {
         scope="row"
         className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          className="w-10 h-10 rounded-full"
-          src="https://img.freepik.com/free-vector/nft-non-fungible-token-concept-with-neon-light-effect_1017-41102.jpg?w=826&t=st=1688758281~exp=1688758881~hmac=5c3f52f5944d46cd5b23b5bb89ac3524dfaec2fe4f05f953f81075cefce20863"
-          alt="nft logo"
-        />
+        {targetNft ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            className="w-10 h-10 rounded-full"
+            src={targetNft.image_url}
+            alt="nft logo"
+          />
+        ) : (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            className="w-10 h-10 rounded-full"
+            src="https://img.freepik.com/free-vector/nft-non-fungible-token-concept-with-neon-light-effect_1017-41102.jpg?w=826&t=st=1688758281~exp=1688758881~hmac=5c3f52f5944d46cd5b23b5bb89ac3524dfaec2fe4f05f953f81075cefce20863"
+            alt="nft logo"
+          />
+        )}
+
         <a
           className="text-white pl-3"
           href={`https://starkscan.co/contract/${transaction.contract_address}`}
         >
-          {transaction.name === null
-            ? substr(transaction.contract_address)
-            : transaction.name}
+          {targetNft ? targetNft.name : substr(transaction.contract_address)}
         </a>
       </th>
       <td className="px-6 py-4 text-white">
