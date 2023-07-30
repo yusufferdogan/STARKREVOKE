@@ -105,7 +105,16 @@ export function ListItemERC20({ transaction }) {
           ? '> 100000'
           : parseFloat(ethers.utils.formatEther(num)) < 0.0001
           ? '< 0.0001'
-          : parseFloat(ethers.utils.formatEther(num)).toFixed(4).toString()}
+          : decimal[transaction.contractAddress]
+          ? parseFloat(ethers.utils.formatEther(num)).toFixed(4).toString()
+          : parseFloat(
+              ethers.utils.formatUnits(
+                num,
+                decimal[transaction.contractAddress]
+              )
+            )
+              .toFixed(4)
+              .toString()}
 
         <span>
           &nbsp;&nbsp;
