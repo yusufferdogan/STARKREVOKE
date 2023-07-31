@@ -1,15 +1,12 @@
 import { BigNumber, ethers, constants } from 'ethers';
 import {
-  useContractRead,
   useAccount,
   useContractWrite,
 } from '@starknet-react/core';
 import React from 'react';
 import { useMemo } from 'react';
-import { uint256 } from 'starknet';
-import { ERC721_ABI } from '../../constants/abi';
-import { Spinner } from './spinner';
 import { nftData } from '../../constants/nftData';
+import { SPENDERS } from '../../constants/spenders';
 function convertSecondsToDate(seconds) {
   const milliseconds = seconds * 1000;
   const date = new Date(milliseconds);
@@ -23,19 +20,26 @@ function substr(str) {
     str.substring(0, 4) + '...' + str.substring(str.length - 4, str.length)
   );
 }
+function insertCharAt(str, char, index) {
+  if (index > str.length) {
+    // If the index is greater than the string length, simply append the character at the end
+    return str + char;
+  } else if (index < 0) {
+    // If the index is negative, prepend the character at the beginning
+    return char + str;
+  } else {
+    // Insert the character at the specified index
+    return str.slice(0, index) + char + str.slice(index);
+  }
+}
 export function ListItemERC721({ transaction }) {
   const targetNft = nftData.find(
     (nft) => nft.contract_address === transaction.contract_address
   );
+  const spender = SPENDERS.find(
+    (sp) => sp.contract_address === insertCharAt(transaction.spender, '0', 2)
+  );
 
-  const { address, status } = useAccount();
-  const { data, isLoading, error, refetch } = useContractRead({
-    address: transaction.contract_address,
-    abi: ERC721_ABI.abi,
-    functionName: 'allowance',
-    args: [address, transaction.spender],
-    watch: false,
-  });
   const calls_approve = useMemo(() => {
     const tx = {
       contractAddress: transaction.contract_address,
@@ -46,7 +50,6 @@ export function ListItemERC721({ transaction }) {
   }, [transaction.contract_address, transaction.tokenId]);
 
   const { write: approveWrite } = useContractWrite({ calls: calls_approve });
-
   const calls_setApproveForAll = useMemo(() => {
     const tx = {
       contractAddress: transaction.contract_address,
@@ -60,7 +63,11 @@ export function ListItemERC721({ transaction }) {
     calls: calls_setApproveForAll,
   });
 
-  if (isLoading) return null;
+  if (transaction.isSetApprovalForAll && transaction.tokenId == '0x0')
+    return null;
+
+  if (!transaction.isSetApprovalForAll && transaction.spender == '0x0')
+    return null;
 
   return (
     <tr
@@ -104,13 +111,18 @@ export function ListItemERC721({ transaction }) {
             BigNumber.from(transaction.tokenId).toNumber().toString()}
       </td>
       <td className="px-6 py-4 text-white">
-        <a href={`https://starkscan.co/contract/${transaction.spender}`}>
-          {transaction.spender.substring(0, 4) +
-            '...' +
-            transaction.spender.substring(
-              transaction.spender.length - 4,
-              transaction.spender.length
-            )}
+        <a
+          className="text-ellipsis"
+          href={`https://starkscan.co/contract/${transaction.spender}`}
+        >
+          {spender
+            ? spender.name_tag
+            : transaction.spender.substring(0, 4) +
+              '...' +
+              transaction.spender.substring(
+                transaction.spender.length - 4,
+                transaction.spender.length
+                )}
         </a>
       </td>{' '}
       <td className="px-6 py-4 text-white">
