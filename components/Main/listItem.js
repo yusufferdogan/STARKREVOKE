@@ -1,7 +1,7 @@
 import React from 'react';
-import { useMemo, useState } from 'react';
-import { BigNumber, ethers } from 'ethers';
-import { Spinner } from './spinner';
+import { useMemo } from 'react';
+import { ethers } from 'ethers';
+import { SPENDERS } from '../../constants/spenders';
 import {
   useContractRead,
   useAccount,
@@ -18,13 +18,26 @@ function convertSecondsToDate(seconds) {
 export function uint256ToBN(uint256 /*: Uint256*/) {
   return (BigInt(uint256.high) << 128n) + BigInt(uint256.low);
 }
+function insertCharAt(str, char, index) {
+  if (index > str.length) {
+    // If the index is greater than the string length, simply append the character at the end
+    return str + char;
+  } else if (index < 0) {
+    // If the index is negative, prepend the character at the beginning
+    return char + str;
+  } else {
+    // Insert the character at the specified index
+    return str.slice(0, index) + char + str.slice(index);
+  }
+}
 const currency = {
   '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7': 'ETH',
   '0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8': 'USDC',
   '0x068f5c6a61780768455de69077e07e89787839bf8166decfbf92b645209c0fb8': 'USDT',
   '0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3': 'DAI',
   '0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac': 'WBTC',
-  '0x042b8f0484674ca266ac5d08e4ac6a3fe65bd3129795def2dca5c34ecc5f96d2': 'wstETH'
+  '0x042b8f0484674ca266ac5d08e4ac6a3fe65bd3129795def2dca5c34ecc5f96d2':
+    'wstETH',
 };
 const icon = {
   '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7':
@@ -45,26 +58,8 @@ const decimal = {
   '0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3': 18,
   '0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac': 8,
 };
-const name = {
-  '0x041fd22b238fa21cfcf5dd45a8548974d8263b3a531a60388411c5e230f97023':
-    'JediSwap: AMM Swap',
-  '0x07a6f98c03379b9513ca84cca1373ff452a7462a3b61598f0af5bb27ad7f76d1':
-    '10KSwap: AMM Router',
-  '0x04270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f':
-    'AVNU: Exchange',
-  '0x010884171baf1914edc28d7afb619b40a4051cfae78a094a55d230f19e944a28':
-    'mySwap: AMM Swap',
-  '0x04c0a5193d58f74fbace4b74dcf65481e734ed1714121bdc571da345540efa05':
-    'zkLend: Market',
-  '0x028c858a586fa12123a1ccb337a0a3b369281f91ea00544d0c086524b759f627':
-    'SithSwap: AMM Router',
-  '0x01b23ed400b210766111ba5b1e63e33922c6ba0c45e6ad56ce112e5f4c578e62':
-    'Fibrous Finance',
-  // "" : "",
-};
 export function ListItemERC20({ transaction }) {
   const { address, status } = useAccount();
-  const [amount, setAmount] = useState(0);
   const { data, isLoading, error, refetch } = useContractRead({
     address: transaction.contract_address,
     abi: ERC20_ABI.abi,
@@ -88,10 +83,14 @@ export function ListItemERC20({ transaction }) {
   if (data === undefined) return <span>data is undefined...</span>;
   const num = BigInt(uint256ToBN(data?.remaining));
   if (num === 0n) return null;
+
   const date = convertSecondsToDate(transaction.timestamp);
+  const spender = SPENDERS.find(
+    (sp) => sp.contract_address === insertCharAt(transaction.spender, '0', 2)
+  );
   return (
     <tr
-      className="border-b dark:bg-gray-800 dark:border-gray-700
+      className="border-b rounded-lg dark:bg-gray-800 dark:border-gray-700
      hover:bg-gray-700 dark:hover:bg-gray-600"
     >
       <th
@@ -143,8 +142,8 @@ export function ListItemERC20({ transaction }) {
       </td>
       <td className="px-6 py-4 text-white">
         <a href={`https://starkscan.co/contract/${transaction.spender}`}>
-          {name[transaction.spender]
-            ? name[transaction.spender]
+          {spender
+            ? spender.name_tag
             : transaction.spender.substring(0, 4) +
               '...' +
               transaction.spender.substring(
