@@ -9,6 +9,7 @@ import {
 } from '@starknet-react/core';
 import { ListItemERC20 } from './listItem';
 import { ListItemERC721 } from './listItemErc721';
+
 require('dotenv').config();
 function Home() {
   const { account, address, status } = useAccount();
@@ -31,19 +32,8 @@ function Home() {
       [key]: value,
     }));
   };
-  //only erc20 addresses
-  const [addressSet, setAddressSet] = useState(new Set());
-
-  const addToAddressSet = (value) => {
-    setAddressSet((prevSet) => new Set([...prevSet, value]));
-  };
-
-  function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
   useEffect(() => {
     async function filterAddresses(transactions) {
-      console.log('filterAddresses:', transactions);
       for (let i = 0; i < transactions.length; i++) {
         const element = transactions[i];
         if (element.account_calls.length > 0) {
@@ -67,21 +57,21 @@ function Home() {
                   blockNumber: account_call.block_number,
                 };
                 updateErc20Map(obj.contract_address.concat(obj.spender), obj);
-                addToAddressSet(obj.contract_address);
-              } else {
-                const obj = {
-                  transaction_hash: account_call.transaction_hash,
-                  spender: account_call.calldata[0],
-                  tokenId: account_call.calldata[1],
-                  timestamp: account_call.timestamp,
-                  contract_address: account_call.contract_address,
-                  isSetApprovalForAll: false,
-                  name: null,
-                  symbol: null,
-                };
-                updateErc721Map(obj.contract_address.concat(obj.spender), obj);
-                addToAddressSet(obj.contract_address);
-              }
+              } 
+              // else {
+              //   //TODO: SPENDER != ADDRESS(0)
+              //   const obj = {
+              //     transaction_hash: account_call.transaction_hash,
+              //     spender: account_call.calldata[0],
+              //     tokenId: account_call.calldata[1],
+              //     timestamp: account_call.timestamp,
+              //     contract_address: account_call.contract_address,
+              //     isSetApprovalForAll: false,
+              //     name: null,
+              //     symbol: null,
+              //   };
+              //   updateErc721Map(obj.contract_address.concat(obj.spender), obj);
+              // }
             }
             // means approved for entire collection
             if (account_call.selector_name === 'setApprovalForAll') {
@@ -96,7 +86,6 @@ function Home() {
                 symbol: null,
               };
               updateErc721Map(obj.contract_address.concat(obj.spender), obj);
-              addToAddressSet(obj.contract_address);
             }
           }
         }
@@ -111,7 +100,6 @@ function Home() {
         setIsLoading(true);
         try {
           const data = await fetchData();
-          console.log('fetchDataAndFilterAddresses', data);
           if (data) filterAddresses(data);
         } catch (error) {
           console.error('Error fetching data:', error);
@@ -138,14 +126,13 @@ function Home() {
 
     fetchDataAndFilterAddresses(address, isLoaded, setIsLoading);
   }, [address, isLoaded]); // Empty dependency array ensures this effect runs only once, when the component mounts
-  console.log("20:",erc20Map);
-  console.log("721:",erc721Map);
+
   return (
     <div className="px-20">
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg border mx-20 rounded-lg  ">
+      <div className="relative overflow-x-auto shadow-md sm:rounded-lg border mx-20 rounded-lg">
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
           <thead className="font-bold text-white uppercase dark:bg-gray-700 dark:text-gray-400">
-            <tr>
+            <tr className='border-b'>
               <th scope="col" className="px-6 py-3 ">
                 Asset
               </th>
