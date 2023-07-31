@@ -81,7 +81,7 @@ export function ListItemERC721({ transaction }) {
         scope="row"
         className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
       >
-        {targetNft ? (
+        {targetNft.image_url ? (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
             className="w-10 h-10 rounded-full"

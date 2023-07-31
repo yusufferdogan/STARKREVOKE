@@ -422,4 +422,15 @@ export const nftData = [
     banner_url:
       'https://static.starkscan.co/nfts/0x00db4bcb14310cebda0ab395ff6c696d180721be9bea6040c128eb6e149a163a/banners/QmYSBBYKb6f65s4D4LqVXX8DnLaW9gguunnzCA1x4AR9jR',
   },
+  {
+    contract_address:
+      '0x0088b0a6e4eaa5b05247d79c6a63b75d9829a28a4ff2f37a021c59cc241cd324',
+    schema: 'ERC721',
+    name: 'Dares Nft',
+    description: null,
+    symbol: 'DARES',
+    external_url: null,
+    image_url: null,
+    banner_url: null,
+  },
 ];
