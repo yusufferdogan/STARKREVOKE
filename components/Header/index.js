@@ -4,12 +4,12 @@ import { ConnectWallet } from './utils';
 import Image from 'next/image';
 import Logo from '../../constants/images/logo.svg';
 import { ToastContainer, toast } from 'react-toastify';
-
+import { IoLogoGithub } from 'react-icons/io';
 function Header() {
   return (
     <header aria-label="Site Header">
       <ToastContainer autoClose={false} draggable={false} />
-      <div className="mx-auto max-w-screen-3xl px-4 sm:px-6 lg:px-8 items-center pb-10">
+      <div className="mx-auto max-w-screen-3xl px-4 sm:px-6 lg:px-8 items-center pb-20">
         <div className="flex h-16 items-center justify-between">
           <div className="md:flex md:items-center md:gap-12">
             <Link href="/">
@@ -19,44 +19,31 @@ function Header() {
               </div>
             </Link>
           </div>
-          {/* <div className="hidden md:block">
+          <div className="hidden md:block">
             <nav aria-label="Site Nav">
               <ul className="flex items-center gap-6 text-sm">
                 <li>
-                  <Link
-                    className="text-gray-500 transition hover:text-gray-500/75"
-                    href="/#about"
+                  <a
+                    className="text-white transition hover:text-gray-500/75"
+                    href="https://github.com/yusufferdogan/REVOKE-STARKNET"
                   >
-                    TAB1
-                  </Link>
-                </li>{' '}
-                <li>
-                  <Link
-                    className="text-gray-500 transition hover:text-gray-500/75"
-                    href="/#about"
-                  >
-                    TAB2
-                  </Link>
-                </li>{' '}
-                <li>
-                  <Link
-                    className="text-gray-500 transition hover:text-gray-500/75"
-                    href="/#about"
-                  >
-                    TAB3
-                  </Link>
-                </li>{' '}
-                <li>
-                  <Link
-                    className="text-gray-500 transition hover:text-gray-500/75"
-                    href="/#about"
-                  >
-                    TAB4
-                  </Link>
+                    <div class="group relative m-12 flex justify-center">
+                      <button
+                        class="rounded px-4 py-2 text-sm
+                       text-white shadow-sm"
+                      >
+                        <IoLogoGithub className="text-5xl" />
+                      </button>
+                      <span class="absolute top-10 scale-0 rounded bg-gray-800
+                       p-2 text-xs text-white group-hover:scale-100 text-left">
+                        ✨ Github Repo, Contributons are welcomed
+                      </span>
+                    </div>
+                  </a>
                 </li>
               </ul>
             </nav>
-          </div> */}
+          </div>
           <div className="flex items-center">
             <div className="pr-10">
               <ConnectWallet></ConnectWallet>
