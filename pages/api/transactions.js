@@ -1,38 +1,31 @@
 import axios from 'axios';
-import mockData from "../../constants/mockTx.json"
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 export default async function handler(req, res) {
   const url = 'https://api.starkscan.co/api/v0/transactions/';
   const contract_address = req.query.id; // Use the 'id' from req.query as the contract_address
-  const limit = 20;
+  const limit = 100;
   const headers = {
     accept: 'application/json',
     'x-api-key': 'docs-starkscan-co-api-123',
   };
 
   const data = [];
-  let counter = 1;
+  const params = { contract_address, limit, cursor: null };
   try {
+    let next_url = null;
     do {
-      console.log('sending req:', counter);
-      counter++;
-      const startTime = new Date().getTime();
-
-      const params = { contract_address, limit, cursor: null };
-
       const response = await axios.get(url, {
         headers,
         params: params,
-        order_by: 'asc'
+        order_by: 'asc',
       });
 
-      console.log("response.next_url:", response.data.next_url)
-      // console.log("response:", response)
+      next_url = response.data.next_url;
 
-      if (response.data.next_url) {
-        const searching_url = new URL(response.data.next_url);
+      if (next_url) {
+        const searching_url = new URL(next_url);
         const searchParams = searching_url.searchParams;
         const cursor = searchParams.get('cursor'); // 'value1'
         if (cursor) {
@@ -46,28 +39,14 @@ export default async function handler(req, res) {
         data.push(element);
       }
 
-      console.log('data.length: ', data.length);
-
-      const endTime = new Date().getTime();
-
-      // Calculate the time elapsed in milliseconds
-      const timeElapsed = endTime - startTime;
-
-      console.log('Time Elapsed (ms):', timeElapsed);
-
-      console.log('response.data.data.length:', response.data.data.length);
-
-      if (response.data.next_url) await sleep(1000);
-      if (response.data.next_url) break;
+      if (next_url) await sleep(1000);
+      if (next_url === undefined || next_url === null) break;
     } while (1);
-
-    console.log('Data.length:', data.length);
 
     // Set the Access-Control-Allow-Origin header to allow requests from any origin
     res.setHeader('Access-Control-Allow-Origin', '*');
 
     // Return the resource data as a JSON response
-    console.log("REQUESTED");
     res.status(200).json(data);
   } catch (error) {
     console.error('Error fetching resource:', error);
