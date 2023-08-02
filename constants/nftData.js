@@ -433,4 +433,37 @@ export const nftData = [
     image_url: null,
     banner_url: null,
   },
+  {
+    contract_address:
+      '0x07b6803a21879ba67cee0795c6b7db6da13ab03fc8fc15cbf9283b4ac30b272c',
+    schema: 'ERC721',
+    name: 'Golden Carrot',
+    description: null,
+    symbol: 'Golden Carrot',
+    external_url: null,
+    image_url: null,
+    banner_url: null,
+  },
+  {
+    contract_address:
+      '0x069573524616d02f22bfcf0851413ba8feeb3d43f7f537362f6036d954e3a6ad',
+    schema: 'ERC721',
+    name: 'StarkBunny',
+    description: null,
+    symbol: 'BUNNY',
+    external_url: null,
+    image_url: null,
+    banner_url: null,
+  },
+  {
+    contract_address:
+      '0x05b5b1b7b6f683cf5c765cc5599fc05c16fddcfbe14846b6e2ec5ba9e3848b34',
+    schema: 'ERC721',
+    name: 'Expectium Shares',
+    description: null,
+    symbol: 'EXPS',
+    external_url: null,
+    image_url: null,
+    banner_url: null,
+  },
 ];
