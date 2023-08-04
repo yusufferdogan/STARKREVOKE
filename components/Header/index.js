@@ -19,31 +19,6 @@ function Header() {
               </div>
             </Link>
           </div>
-          <div className="hidden md:block">
-            <nav aria-label="Site Nav">
-              <ul className="flex items-center gap-6 text-sm">
-                <li>
-                  <a
-                    className="text-white transition hover:text-gray-500/75"
-                    href="https://github.com/yusufferdogan/REVOKE-STARKNET"
-                  >
-                    <div class="group relative m-12 flex justify-center">
-                      <button
-                        class="rounded px-4 py-2 text-sm
-                       text-white shadow-sm"
-                      >
-                        <IoLogoGithub className="text-5xl" />
-                      </button>
-                      <span class="absolute top-10 scale-0 rounded bg-gray-800
-                       p-2 text-xs text-white group-hover:scale-100 text-left">
-                        ✨ Github Repo, Contributons are welcomed
-                      </span>
-                    </div>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          </div>
           <div className="flex items-center">
             <div className="pr-10">
               <ConnectWallet></ConnectWallet>
