@@ -9,11 +9,11 @@ import {
 } from '@starknet-react/core';
 import { ListItemERC20 } from './listItem';
 import { ListItemERC721 } from './listItemErc721';
+import { IoLogoGithub } from 'react-icons/io';
 
 require('dotenv').config();
 function Home() {
   const { account, address, status } = useAccount();
-  // const [transactions, setTransactions] = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
   //erc20 data
   const [erc20Map, setErc20Map] = useState({});
@@ -57,7 +57,7 @@ function Home() {
                   blockNumber: account_call.block_number,
                 };
                 updateErc20Map(obj.contract_address.concat(obj.spender), obj);
-              } 
+              }
               // else {
               //   //TODO: SPENDER != ADDRESS(0)
               //   const obj = {
@@ -126,43 +126,83 @@ function Home() {
 
     fetchDataAndFilterAddresses(address, isLoaded, setIsLoading);
   }, [address, isLoaded]); // Empty dependency array ensures this effect runs only once, when the component mounts
-
   return (
-    <div className="px-20">
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg border mx-20 rounded-lg">
-        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-          <thead className="font-bold text-white uppercase dark:bg-gray-700 dark:text-gray-400">
-            <tr className='border-b'>
-              <th scope="col" className="px-6 py-3 ">
-                Asset
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Allowance
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Spender
-              </th>{' '}
-              <th scope="col" className="px-6 py-3">
-                Last Updated
-              </th>{' '}
-              <th scope="col" className="px-6 py-3">
-                Type
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.entries(erc20Map).map(([key, value]) => (
-              <ListItemERC20 key={key} transaction={value}></ListItemERC20>
-            ))}
-            {Object.entries(erc721Map).map(([key, value]) => (
-              <ListItemERC721 key={key} transaction={value}></ListItemERC721>
-            ))}
-          </tbody>
-        </table>
+    <div>
+      <div className="h-5/6">
+        <div className="relative overflow-x-auto shadow-md sm:rounded-lg border mx-20 rounded-lg">
+          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead className="font-bold text-white uppercase dark:bg-gray-700 dark:text-gray-400">
+              <tr className="border-b">
+                <th scope="col" className="px-6 py-3 ">
+                  Asset
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Allowance
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Spender
+                </th>{' '}
+                <th scope="col" className="px-6 py-3">
+                  Last Updated
+                </th>{' '}
+                <th scope="col" className="px-6 py-3">
+                  Type
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(erc20Map).map(([key, value]) => (
+                <ListItemERC20 key={key} transaction={value}></ListItemERC20>
+              ))}
+              {Object.entries(erc721Map).map(([key, value]) => (
+                <ListItemERC721 key={key} transaction={value}></ListItemERC721>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
+      <nav
+        className="fixed bottom-0 inset-x-0 flex
+       justify-center text-sm uppercase font-mono align-middle"
+      >
+        <a
+          className="text-white transition hover:text-gray-500/75"
+          href="https://github.com/yusufferdogan/REVOKE-STARKNET"
+        >
+          <div className="group relative m-4 flex justify-center">
+            <button
+              className="rounded px-4 py-2 text-sm
+                       text-white shadow-sm"
+            >
+              <IoLogoGithub className="text-5xl" />
+            </button>
+            <span
+              className="absolute bottom-16 scale-0 rounded bg-gray-800
+                       p-2 text-xs text-white group-hover:scale-100 text-left w-32"
+            >
+              ✨ Github Repo Contributons are welcomed
+            </span>
+          </div>
+        </a>
+        <div className="justify-center mt-10 pl-10 font-mono">
+          Made for &nbsp;
+          <span className="text-rose-500 font-bold font-mono text-lg">
+            <a href="https://alpha.starkguardians.com/">StarkGuardians</a>
+          </span>
+          &nbsp; by &nbsp;
+          <span>
+            <a
+              className="text-blue-500 font-bold font-mono text-lg"
+              href="https://github.com/yusufferdogan"
+            >
+              Yusuf Erdogan
+            </a>
+          </span>
+        </div>
+      </nav>
     </div>
   );
 }
