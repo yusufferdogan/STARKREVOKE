@@ -9,7 +9,7 @@ function Header() {
   return (
     <header aria-label="Site Header">
       <ToastContainer autoClose={false} draggable={false} />
-      <div className="mx-auto max-w-screen-3xl px-4 sm:px-6 lg:px-8 items-center pb-20">
+      <div className="mx-auto max-w-screen-3xl px-4 sm:px-6 lg:px-8 items-center pb-10">
         <div className="flex h-16 items-center justify-between">
           <div className="md:flex md:items-center md:gap-12">
             <Link href="/">
