@@ -127,11 +127,20 @@ function Home() {
     fetchDataAndFilterAddresses(address, isLoaded, setIsLoading);
   }, [address, isLoaded]); // Empty dependency array ensures this effect runs only once, when the component mounts
   return (
-    <div>
-      <div className="h-5/6">
-        <div className="relative overflow-x-auto shadow-md sm:rounded-lg border mx-20 rounded-lg">
-          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-            <thead className="font-bold text-white uppercase dark:bg-gray-700 dark:text-gray-400">
+    <div className='min-w-full'>
+      <div className="overflow-y-scroll" style={{maxHeight: "79vh"}}>
+        <div
+          className="relative overflow-x-auto shadow-md 
+        sm:rounded-lg border mx-20 rounded-lg"
+        >
+          <table
+            className="w-full text-sm text-left
+           text-gray-500 dark:text-gray-400"
+          >
+            <thead
+              className="font-bold text-white uppercase
+             dark:bg-gray-700 dark:text-gray-400"
+            >
               <tr className="border-b">
                 <th scope="col" className="px-6 py-3 ">
                   Asset
@@ -153,7 +162,7 @@ function Home() {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className=''>
               {Object.entries(erc20Map).map(([key, value]) => (
                 <ListItemERC20 key={key} transaction={value}></ListItemERC20>
               ))}
@@ -165,7 +174,7 @@ function Home() {
         </div>
       </div>
       <nav
-        className="fixed bottom-0 inset-x-0 flex
+        className="bottom-0 inset-x-0 flex
        justify-center text-sm uppercase font-mono align-middle"
       >
         <a
