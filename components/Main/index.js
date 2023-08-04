@@ -127,8 +127,8 @@ function Home() {
     fetchDataAndFilterAddresses(address, isLoaded, setIsLoading);
   }, [address, isLoaded]); // Empty dependency array ensures this effect runs only once, when the component mounts
   return (
-    <div className='min-w-full'>
-      <div className="overflow-y-scroll" style={{maxHeight: "79vh"}}>
+    <div className="min-w-full">
+      <div className="overflow-y-scroll" style={{ maxHeight: '79vh' }}>
         <div
           className="relative overflow-x-auto shadow-md 
         sm:rounded-lg border mx-20 rounded-lg"
@@ -162,7 +162,7 @@ function Home() {
                 </th>
               </tr>
             </thead>
-            <tbody className=''>
+            <tbody className="">
               {Object.entries(erc20Map).map(([key, value]) => (
                 <ListItemERC20 key={key} transaction={value}></ListItemERC20>
               ))}
@@ -197,11 +197,7 @@ function Home() {
           </div>
         </a>
         <div className="justify-center mt-10 pl-10 font-mono">
-          Made for &nbsp;
-          <span className="text-rose-500 font-bold font-mono text-lg">
-            <a href="https://alpha.starkguardians.com/">StarkGuardians</a>
-          </span>
-          &nbsp; by &nbsp;
+          Made by &nbsp;
           <span>
             <a
               className="text-blue-500 font-bold font-mono text-lg"
