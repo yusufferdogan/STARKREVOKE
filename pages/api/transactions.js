@@ -47,7 +47,7 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
 
     // Return the resource data as a JSON response
-    res.status(200).json(data);
+    res.status(200).json(data.reverse());
   } catch (error) {
     console.error('Error fetching resource:', error);
     res.status(500).send('Error fetching resource');
