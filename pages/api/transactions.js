@@ -2,13 +2,14 @@ import axios from 'axios';
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+require('dotenv').config();
 export default async function handler(req, res) {
   const url = 'https://api.starkscan.co/api/v0/transactions/';
   const contract_address = req.query.id; // Use the 'id' from req.query as the contract_address
   const limit = 100;
   const headers = {
     accept: 'application/json',
-    'x-api-key': 'docs-starkscan-co-api-123',
+    'x-api-key': process.env.API_KEY,
   };
 
   const data = [];
