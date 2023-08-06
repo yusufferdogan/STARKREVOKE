@@ -14,6 +14,10 @@ export default async function handler(req, res) {
 
   const data = [];
   const params = { contract_address, limit, cursor: null };
+  console.log(
+    process.env.API_KEY == 'docs-starkscan-co-api-123',
+    'default api key'
+  );
   try {
     let next_url = null;
     do {
@@ -45,7 +49,7 @@ export default async function handler(req, res) {
     } while (1);
 
     // Set the Access-Control-Allow-Origin header to allow requests from any origin
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.starkrevoke.com/');
 
     // Return the resource data as a JSON response
     res.status(200).json(data.reverse());
