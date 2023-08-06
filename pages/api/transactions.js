@@ -52,7 +52,6 @@ export default async function handler(req, res) {
     res.status(200).json(data.reverse());
   } catch (error) {
     console.error('Error fetching resource:', error);
-    console.error(process.env.API_KEY);
     res.status(500).send('Error fetching resource');
   }
 }
