@@ -14,10 +14,7 @@ export default async function handler(req, res) {
 
   const data = [];
   const params = { contract_address, limit, cursor: null };
-  console.log(
-    process.env.API_KEY == 'docs-starkscan-co-api-123',
-    'default api key'
-  );
+
   try {
     let next_url = null;
     do {
@@ -55,6 +52,7 @@ export default async function handler(req, res) {
     res.status(200).json(data.reverse());
   } catch (error) {
     console.error('Error fetching resource:', error);
+    console.error(process.env.API_KEY);
     res.status(500).send('Error fetching resource');
   }
 }
