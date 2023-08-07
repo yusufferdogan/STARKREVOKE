@@ -58,6 +58,35 @@ const decimal = {
   '0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3': 18,
   '0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac': 8,
 };
+function unitValue(transaction, num) {
+  if (decimal[transaction.contractAddress]) {
+    const formatted = ethers.utils.formatUnits(num, decimal[transaction.contractAddress])
+    if (BigInt(num) >= UINT_256_MAX) return 'unlimited';
+    else if (parseFloat(ethers.utils.formatEther(num)) > 1000) return '> 1000';
+    else if (parseFloat(ethers.utils.formatEther(num)) < 0.0001)
+      return '< 0.0001';
+      else return parseFloat(ethers.utils.formatEther(num)).toFixed(4).toString()
+  } else {
+    if (BigInt(num) >= UINT_256_MAX) return 'unlimited';
+    else if (parseFloat(ethers.utils.formatEther(num)) > 1000) return '> 1000';
+    else if (parseFloat(ethers.utils.formatEther(num)) < 0.0001)
+      return '< 0.0001';
+      else return parseFloat(ethers.utils.formatEther(num)).toFixed(4).toString()
+  }
+  BigInt(num) >= UINT_256_MAX
+    ? 'unlimited'
+    : parseFloat(ethers.utils.formatEther(num)) > 1000
+    ? '> 1000'
+    : parseFloat(ethers.utils.formatEther(num)) < 0.0001
+    ? '< 0.0001'
+    : decimal[transaction.contractAddress]
+    ? parseFloat(ethers.utils.formatEther(num)).toFixed(4).toString()
+    : parseFloat(
+        ethers.utils.formatUnits(num, decimal[transaction.contractAddress])
+      )
+        .toFixed(4)
+        .toString();
+}
 export function ListItemERC20({ transaction }) {
   const { address, status } = useAccount();
   const { data, isLoading, error, refetch } = useContractRead({
@@ -116,22 +145,7 @@ export function ListItemERC20({ transaction }) {
         </a>
       </th>
       <td className="px-6 py-4 text-white">
-        {BigInt(num) >= UINT_256_MAX
-          ? 'unlimited'
-          : parseFloat(ethers.utils.formatEther(num)) > 1000
-          ? '> 1000'
-          : parseFloat(ethers.utils.formatEther(num)) < 0.0001
-          ? '< 0.0001'
-          : decimal[transaction.contractAddress]
-          ? parseFloat(ethers.utils.formatEther(num)).toFixed(4).toString()
-          : parseFloat(
-              ethers.utils.formatUnits(
-                num,
-                decimal[transaction.contractAddress]
-              )
-            )
-              .toFixed(4)
-              .toString()}
+        {}
 
         <span>
           &nbsp;&nbsp;
