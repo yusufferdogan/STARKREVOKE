@@ -1,11 +1,7 @@
 import { React, useEffect, useState } from 'react';
 import 'tailwindcss/tailwind.css';
-import MyFooter from '../Footer';
 import {
-  useConnectors,
   useAccount,
-  useContractRead,
-  useBalance,
 } from '@starknet-react/core';
 import { ListItemERC20 } from './listItem';
 import { ListItemERC721 } from './listItemErc721';
@@ -13,11 +9,10 @@ import { IoLogoGithub } from 'react-icons/io';
 
 require('dotenv').config();
 function Home() {
-  const { account, address, status } = useAccount();
+  const {address } = useAccount();
   const [isLoaded, setIsLoaded] = useState(false);
   //erc20 data
   const [erc20Map, setErc20Map] = useState({});
-  const [loading, setIsLoading] = useState(false);
   const updateErc20Map = (key, value) => {
     setErc20Map((prevMap) => ({
       ...prevMap,
@@ -90,17 +85,14 @@ function Home() {
     const fetchDataAndFilterAddresses = async (
       address,
       isLoaded,
-      setIsLoading
     ) => {
       if (address && !isLoaded) {
-        setIsLoading(true);
         try {
           const data = await fetchData();
           if (data) filterAddresses(data);
         } catch (error) {
           console.error('Error fetching data:', error);
         } finally {
-          setIsLoading(false);
           setIsLoaded(true);
         }
       }
@@ -120,7 +112,7 @@ function Home() {
       }
     };
 
-    fetchDataAndFilterAddresses(address, isLoaded, setIsLoading);
+    fetchDataAndFilterAddresses(address, isLoaded);
   }, [address, erc20Map, isLoaded]); // Empty dependency array ensures this effect runs only once, when the component mounts
   return (
     <div className="min-w-full">
