@@ -33,6 +33,11 @@ function Home() {
     }));
   };
   useEffect(() => {
+    const deleteKeyFromErc20Map = (keyToDelete) => {
+      const updatedMap = { ...erc20Map };
+      delete updatedMap[keyToDelete];
+      setErc20Map(updatedMap);
+    };
     async function filterAddresses(transactions) {
       for (let i = 0; i < transactions.length; i++) {
         const element = transactions[i];
@@ -56,22 +61,13 @@ function Home() {
                   contract_address: account_call.contract_address,
                   blockNumber: account_call.block_number,
                 };
-                updateErc20Map(obj.contract_address.concat(obj.spender), obj);
+                if (obj.amount.low == '0x0' && obj.amount.high == '0x0')
+                  deleteKeyFromErc20Map(
+                    obj.contract_address.concat(obj.spender)
+                  );
+                else
+                  updateErc20Map(obj.contract_address.concat(obj.spender), obj);
               }
-              // else {
-              //   //TODO: SPENDER != ADDRESS(0)
-              //   const obj = {
-              //     transaction_hash: account_call.transaction_hash,
-              //     spender: account_call.calldata[0],
-              //     tokenId: account_call.calldata[1],
-              //     timestamp: account_call.timestamp,
-              //     contract_address: account_call.contract_address,
-              //     isSetApprovalForAll: false,
-              //     name: null,
-              //     symbol: null,
-              //   };
-              //   updateErc721Map(obj.contract_address.concat(obj.spender), obj);
-              // }
             }
             // means approved for entire collection
             if (account_call.selector_name === 'setApprovalForAll') {
@@ -125,7 +121,7 @@ function Home() {
     };
 
     fetchDataAndFilterAddresses(address, isLoaded, setIsLoading);
-  }, [address, isLoaded]); // Empty dependency array ensures this effect runs only once, when the component mounts
+  }, [address, erc20Map, isLoaded]); // Empty dependency array ensures this effect runs only once, when the component mounts
   return (
     <div className="min-w-full">
       <div className="overflow-y-scroll" style={{ maxHeight: '79vh' }}>
