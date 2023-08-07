@@ -1,37 +1,17 @@
-import { BigNumber, ethers, constants } from 'ethers';
+import { BigNumber } from 'ethers';
 import {
-  useAccount,
   useContractWrite,
 } from '@starknet-react/core';
 import React from 'react';
 import { useMemo } from 'react';
 import { nftData } from '../../constants/nftData';
 import { SPENDERS } from '../../constants/spenders';
-function convertSecondsToDate(seconds) {
-  const milliseconds = seconds * 1000;
-  const date = new Date(milliseconds);
-  return date;
-}
-export function uint256ToBN(uint256) {
-  return (BigInt(uint256.high) << 128n) + BigInt(uint256.low);
-}
-function substr(str) {
-  return (
-    str.substring(0, 4) + '...' + str.substring(str.length - 4, str.length)
-  );
-}
-function insertCharAt(str, char, index) {
-  if (index > str.length) {
-    // If the index is greater than the string length, simply append the character at the end
-    return str + char;
-  } else if (index < 0) {
-    // If the index is negative, prepend the character at the beginning
-    return char + str;
-  } else {
-    // Insert the character at the specified index
-    return str.slice(0, index) + char + str.slice(index);
-  }
-}
+import {
+  convertSecondsToDate,
+  insertCharAt,
+  substr,
+} from './utils';
+
 export function ListItemERC721({ transaction }) {
   const targetNft = nftData.find(
     (nft) => nft.contract_address === transaction.contract_address
