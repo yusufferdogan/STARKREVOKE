@@ -1,15 +1,13 @@
 import { React, useEffect, useState } from 'react';
 import 'tailwindcss/tailwind.css';
-import {
-  useAccount,
-} from '@starknet-react/core';
+import { useAccount } from '@starknet-react/core';
 import { ListItemERC20 } from './listItem';
 import { ListItemERC721 } from './listItemErc721';
 import { IoLogoGithub } from 'react-icons/io';
 
 require('dotenv').config();
 function Home() {
-  const {address } = useAccount();
+  const { address } = useAccount();
   const [isLoaded, setIsLoaded] = useState(false);
   //erc20 data
   const [erc20Map, setErc20Map] = useState({});
@@ -82,10 +80,7 @@ function Home() {
         }
       }
     }
-    const fetchDataAndFilterAddresses = async (
-      address,
-      isLoaded,
-    ) => {
+    const fetchDataAndFilterAddresses = async (address, isLoaded) => {
       if (address && !isLoaded) {
         try {
           const data = await fetchData();
