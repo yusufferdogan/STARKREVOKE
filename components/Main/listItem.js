@@ -59,33 +59,23 @@ const decimal = {
   '0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac': 8,
 };
 function unitValue(transaction, num) {
-  if (decimal[transaction.contractAddress]) {
-    const formatted = ethers.utils.formatUnits(num, decimal[transaction.contractAddress])
+  if (decimal[transaction.contract_address]) {
+    const formatted = ethers.utils.formatUnits(
+      num,
+      decimal[transaction.contract_address]
+    );
     if (BigInt(num) >= UINT_256_MAX) return 'unlimited';
-    else if (parseFloat(ethers.utils.formatEther(num)) > 1000) return '> 1000';
-    else if (parseFloat(ethers.utils.formatEther(num)) < 0.0001)
-      return '< 0.0001';
-      else return parseFloat(ethers.utils.formatEther(num)).toFixed(4).toString()
+    else if (formatted > 1000) return '> 1000';
+    else if (formatted > 1) return parseFloat(formatted).toFixed(2).toString();
+    else if (formatted < 0.001) return '< 0.001';
+    else return parseFloat(formatted).toFixed(4).toString();
   } else {
+    const formatted = parseFloat(ethers.utils.formatEther(num));
     if (BigInt(num) >= UINT_256_MAX) return 'unlimited';
-    else if (parseFloat(ethers.utils.formatEther(num)) > 1000) return '> 1000';
-    else if (parseFloat(ethers.utils.formatEther(num)) < 0.0001)
-      return '< 0.0001';
-      else return parseFloat(ethers.utils.formatEther(num)).toFixed(4).toString()
+    else if (formatted > 1000) return '> 1000';
+    else if (formatted < 0.001) return '< 0.001';
+    else return parseFloat(formatted).toFixed(4).toString();
   }
-  BigInt(num) >= UINT_256_MAX
-    ? 'unlimited'
-    : parseFloat(ethers.utils.formatEther(num)) > 1000
-    ? '> 1000'
-    : parseFloat(ethers.utils.formatEther(num)) < 0.0001
-    ? '< 0.0001'
-    : decimal[transaction.contractAddress]
-    ? parseFloat(ethers.utils.formatEther(num)).toFixed(4).toString()
-    : parseFloat(
-        ethers.utils.formatUnits(num, decimal[transaction.contractAddress])
-      )
-        .toFixed(4)
-        .toString();
 }
 export function ListItemERC20({ transaction }) {
   const { address, status } = useAccount();
@@ -94,7 +84,7 @@ export function ListItemERC20({ transaction }) {
     abi: ERC20_ABI.abi,
     functionName: 'allowance',
     args: [address, transaction.spender],
-    watch: true,
+    watch: false,
   });
   const calls = useMemo(() => {
     const tx = {
@@ -145,10 +135,9 @@ export function ListItemERC20({ transaction }) {
         </a>
       </th>
       <td className="px-6 py-4 text-white">
-        {}
-
+        {unitValue(transaction, num)}
         <span>
-          &nbsp;&nbsp;
+          &nbsp;
           {currency[transaction.contract_address] === undefined
             ? ''
             : currency[transaction.contract_address]}
