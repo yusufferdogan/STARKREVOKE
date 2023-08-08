@@ -118,11 +118,11 @@ function Home() {
         >
           <table
             className="w-full text-sm text-left
-           text-gray-500 dark:text-gray-400"
+           "
           >
             <thead
               className="font-bold text-white uppercase
-             dark:bg-gray-700 dark:text-gray-400"
+             "
             >
               <tr className="border-b">
                 <th scope="col" className="px-6 py-3 ">
