@@ -3,13 +3,8 @@
 First, run the development server:
 
 ```bash
-npm run dev
+yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+![image](https://github.com/yusufferdogan/STARKREVOKE/assets/45846424/60cce3ef-f5d3-4e67-afec-566584ef194e)
 
-You can start editing the page by modifying `pages/index.jsx`. The page auto-updates as you edit the file.
-
-## Learn More
-
-STARKNET-JS , NEXT.JS, TAILWIND BOILERPLATE
