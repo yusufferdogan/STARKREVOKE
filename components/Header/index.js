@@ -13,9 +13,15 @@ function Header() {
         <div className="flex h-16 items-center justify-between">
           <div className="md:flex md:items-center md:gap-12">
             <Link href="/">
-              <div className="block text-white font-extrabold text-3xl">
+              <div className="block text-white font-extrabold items-center">
                 <span className="sr-only">Home</span>
-                <p className="pl-10">Revoke Starknet</p>
+                {/* <p className="pl-10">Revoke Starknet</p> */}
+                <Image
+                  src={'/logo.png'}
+                  alt=""
+                  width={450}
+                  height={150}
+                ></Image>
               </div>
             </Link>
           </div>
