@@ -47,8 +47,8 @@ export function ListItemERC20({ transaction }) {
   );
   return (
     <tr
-      className="border-b rounded-lg dark:bg-gray-800 dark:border-gray-700
-     hover:bg-gray-700 dark:hover:bg-gray-600"
+      className="border-b rounded-lg 
+     hover:bg-gray-700"
     >
       <th
         scope="row"
