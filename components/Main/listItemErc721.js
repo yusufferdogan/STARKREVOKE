@@ -1,16 +1,10 @@
 import { BigNumber } from 'ethers';
-import {
-  useContractWrite,
-} from '@starknet-react/core';
+import { useContractWrite } from '@starknet-react/core';
 import React from 'react';
 import { useMemo } from 'react';
 import { nftData } from '../../constants/nftData';
 import { SPENDERS } from '../../constants/spenders';
-import {
-  convertSecondsToDate,
-  insertCharAt,
-  substr,
-} from './utils';
+import { convertSecondsToDate, insertCharAt, substr } from './utils';
 
 export function ListItemERC721({ transaction }) {
   const targetNft = nftData.find(
@@ -54,8 +48,8 @@ export function ListItemERC721({ transaction }) {
       key={transaction.transaction_hash
         .concat(transaction.spender)
         .concat(transaction.amount)}
-      className="border-b dark:bg-gray-800 dark:border-gray-700
-     hover:bg-gray-700 dark:hover:bg-gray-600"
+      className="border-b 
+     hover:bg-gray-900 dark:hover:bg-gray-600"
     >
       <th
         scope="row"
@@ -102,7 +96,7 @@ export function ListItemERC721({ transaction }) {
               transaction.spender.substring(
                 transaction.spender.length - 4,
                 transaction.spender.length
-                )}
+              )}
         </a>
       </td>{' '}
       <td className="px-6 py-4 text-white">
