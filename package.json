@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@argent/get-starknet": "^6.4.6",
     "@heroicons/react": "^2.0.13",
     "@nextui-org/react": "latest",
     "@reduxjs/toolkit": "^1.9.5",

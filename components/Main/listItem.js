@@ -1,9 +1,7 @@
-import React from 'react';
-import { useMemo } from 'react';
+import { React, useEffect, useState ,useMemo} from 'react';
 import { SPENDERS } from '../../constants/spenders';
 import {
   useContractRead,
-  useAccount,
   useContractWrite,
 } from '@starknet-react/core';
 import { ERC20_ABI } from '../../constants/abi';
@@ -16,7 +14,15 @@ import {
   unitValue,
 } from './utils';
 export function ListItemERC20({ transaction }) {
-  const { address, status } = useAccount();
+  const [address, setAddress] = useState('');
+
+  useEffect(() => {
+    const savedAddress = sessionStorage.getItem('address');
+    if (savedAddress) {
+      setAddress(savedAddress);
+    }
+  }, []);
+
   const { data, isLoading, error, refetch } = useContractRead({
     address: transaction.contract_address,
     abi: ERC20_ABI.abi,

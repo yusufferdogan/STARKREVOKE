@@ -7,7 +7,17 @@ import { IoLogoGithub } from 'react-icons/io';
 
 require('dotenv').config();
 function Home() {
-  const { address } = useAccount();
+  const [connected, setConnected] = useState(false);
+  const [address, setAddress] = useState('');
+
+  useEffect(() => {
+    const isConnected = sessionStorage.getItem('connected') === 'true';
+    const savedAddress = sessionStorage.getItem('address');
+    if (isConnected && savedAddress) {
+      setConnected(true);
+      setAddress(savedAddress);
+    }
+  }, []);
   const [isLoaded, setIsLoaded] = useState(false);
   //erc20 data
   const [erc20Map, setErc20Map] = useState({});
