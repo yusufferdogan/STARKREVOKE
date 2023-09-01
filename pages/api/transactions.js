@@ -1,4 +1,7 @@
 import axios from 'axios';
+import { Provider, Contract, Account, ec, json } from "starknet";
+import { filterAddresses } from './utils';
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -48,6 +51,12 @@ export default async function handler(req, res) {
     // Set the Access-Control-Allow-Origin header to allow requests from any origin
     res.setHeader('Access-Control-Allow-Origin', 'https://www.starkrevoke.com/');
 
+    // const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
+    const obj = filterAddresses(data.reverse());
+    console.log('transactions JS');
+    console.log("erc20:",obj.erc20);
+    console.log("erc721:",obj.erc721);
+  
     // Return the resource data as a JSON response
     res.status(200).json(data.reverse());
   } catch (error) {

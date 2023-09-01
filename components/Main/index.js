@@ -156,6 +156,25 @@ function Home() {
               </tr>
             </thead>
             <tbody className="">
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await fetch(
+                      `/api/transactions?id=${address}`
+                    );
+                    if (!response.ok) {
+                      throw new Error('Request failed');
+                    }
+                    const data = await response.json();
+                    // setTransactions(data);
+                    return data;
+                  } catch (error) {
+                    throw new Error('Error fetching data: ' + error.message);
+                  }
+                }}
+              >
+                TRY
+              </button>
               {Object.entries(erc20Map).map(([key, value]) => (
                 <ListItemERC20 key={key} transaction={value}></ListItemERC20>
               ))}
