@@ -1,19 +1,16 @@
 import { React, useEffect, useState ,useMemo} from 'react';
 import { SPENDERS } from '../../constants/spenders';
 import {
-  useContractRead,
   useContractWrite,
 } from '@starknet-react/core';
-import { ERC20_ABI } from '../../constants/abi';
 import {
   convertSecondsToDate,
   currency,
   icon,
   insertCharAt,
-  uint256ToBN,
   unitValue,
 } from './utils';
-export function ListItemERC20({ transaction }) {
+export function ListItemERC20({ transaction,allowance }) {
   const [address, setAddress] = useState('');
 
   useEffect(() => {
@@ -23,13 +20,6 @@ export function ListItemERC20({ transaction }) {
     }
   }, []);
 
-  const { data, isLoading, error, refetch } = useContractRead({
-    address: transaction.contract_address,
-    abi: ERC20_ABI.abi,
-    functionName: 'allowance',
-    args: [address, transaction.spender],
-    watch: false,
-  });
   const calls = useMemo(() => {
     const tx = {
       contractAddress: transaction.contract_address,
@@ -40,12 +30,6 @@ export function ListItemERC20({ transaction }) {
   }, [transaction.contract_address, transaction.spender]);
 
   const { write } = useContractWrite({ calls });
-
-  if (isLoading) return null;
-  if (error) return <span>Error: {JSON.stringify(error)}</span>;
-  if (data === undefined) return <span>data is undefined...</span>;
-  const num = BigInt(uint256ToBN(data?.remaining));
-  if (num === 0n) return null;
 
   const date = convertSecondsToDate(transaction.timestamp);
   const spender = SPENDERS.find(
@@ -79,7 +63,7 @@ export function ListItemERC20({ transaction }) {
         </a>
       </th>
       <td className="px-6 py-4 text-white">
-        {unitValue(transaction, num)}
+        {unitValue(transaction, allowance)}
         <span>
           &nbsp;
           {currency[transaction.contract_address] === undefined

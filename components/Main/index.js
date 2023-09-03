@@ -9,116 +9,34 @@ require('dotenv').config();
 function Home() {
   const [connected, setConnected] = useState(false);
   const [address, setAddress] = useState('');
+  const [erc20map, setERC20map] = useState({});
+  const [erc721map, setERC721map] = useState({});
 
   useEffect(() => {
-    const isConnected = sessionStorage.getItem('connected') === 'true';
-    const savedAddress = sessionStorage.getItem('address');
-    if (isConnected && savedAddress) {
-      setConnected(true);
-      setAddress(savedAddress);
-    }
-  }, []);
-  const [isLoaded, setIsLoaded] = useState(false);
-  //erc20 data
-  const [erc20Map, setErc20Map] = useState({});
-  const updateErc20Map = (key, value) => {
-    setErc20Map((prevMap) => ({
-      ...prevMap,
-      [key]: value,
-    }));
-  };
-  //erc721 data
-  const [erc721Map, setErc721Map] = useState({});
-  const updateErc721Map = (key, value) => {
-    setErc721Map((prevMap) => ({
-      ...prevMap,
-      [key]: value,
-    }));
-  };
-  useEffect(() => {
-    const deleteKeyFromErc20Map = (keyToDelete) => {
-      const updatedMap = { ...erc20Map };
-      delete updatedMap[keyToDelete];
-      setErc20Map(updatedMap);
-    };
-    async function filterAddresses(transactions) {
-      for (let i = 0; i < transactions.length; i++) {
-        const element = transactions[i];
-        if (element.account_calls.length > 0) {
-          for (let j = 0; j < element.account_calls.length; j++) {
-            const account_call = element.account_calls[j];
-            if (account_call.selector_name === 'approve') {
-              // if result is 0x1 it means true and it is erc20 approve
-              if (
-                account_call.result.length > 0 &&
-                account_call.result[0] === '0x1'
-              ) {
-                const obj = {
-                  transaction_hash: account_call.transaction_hash,
-                  spender: account_call.calldata[0],
-                  amount: {
-                    low: account_call.calldata[1],
-                    high: account_call.calldata[2],
-                  },
-                  timestamp: account_call.timestamp,
-                  contract_address: account_call.contract_address,
-                  blockNumber: account_call.block_number,
-                };
-                if (obj.amount.low == '0x0' && obj.amount.high == '0x0')
-                  deleteKeyFromErc20Map(
-                    obj.contract_address.concat(obj.spender)
-                  );
-                else
-                  updateErc20Map(obj.contract_address.concat(obj.spender), obj);
-              }
-            }
-            // means approved for entire collection
-            if (account_call.selector_name === 'setApprovalForAll') {
-              const obj = {
-                transaction_hash: account_call.transaction_hash,
-                spender: account_call.calldata[0],
-                tokenId: account_call.calldata[1],
-                timestamp: account_call.timestamp,
-                contract_address: account_call.contract_address,
-                isSetApprovalForAll: true,
-                name: null,
-                symbol: null,
-              };
-              updateErc721Map(obj.contract_address.concat(obj.spender), obj);
-            }
-          }
-        }
-      }
-    }
-    const fetchDataAndFilterAddresses = async (address, isLoaded) => {
-      if (address && !isLoaded) {
-        try {
-          const data = await fetchData();
-          if (data) filterAddresses(data);
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        } finally {
-          setIsLoaded(true);
-        }
-      }
-    };
-
-    const fetchData = async () => {
+    const fetchData = async (addr) => {
       try {
-        const response = await fetch(`/api/transactions?id=${address}`);
+        const response = await fetch(`/api/transactions?id=${addr}`);
         if (!response.ok) {
           throw new Error('Request failed');
         }
         const data = await response.json();
-        // setTransactions(data);
+        sessionStorage.setItem('erc20', data.erc20);
+        sessionStorage.setItem('er721', data.erc721);
+        setERC20map(data.erc20);
+        setERC721map(data.erc721);
         return data;
       } catch (error) {
         throw new Error('Error fetching data: ' + error.message);
       }
     };
-
-    fetchDataAndFilterAddresses(address, isLoaded);
-  }, [address, erc20Map, isLoaded]); // Empty dependency array ensures this effect runs only once, when the component mounts
+    const isConnected = sessionStorage.getItem('connected') === 'true';
+    const savedAddress = sessionStorage.getItem('address');
+    if (isConnected && savedAddress) {
+      setConnected(true);
+      setAddress(savedAddress);
+      if (address) fetchData(address);
+    }
+  }, [address]);
   return (
     <div className="min-w-full">
       <div className="overflow-y-scroll" style={{ maxHeight: '79vh' }}>
@@ -175,10 +93,14 @@ function Home() {
               >
                 TRY
               </button>
-              {Object.entries(erc20Map).map(([key, value]) => (
-                <ListItemERC20 key={key} transaction={value}></ListItemERC20>
+              {Object.entries(erc20map).map(([key, value]) => (
+                <ListItemERC20
+                  key={key}
+                  transaction={value.transaction}
+                  allowance={value.allowance}
+                ></ListItemERC20>
               ))}
-              {Object.entries(erc721Map).map(([key, value]) => (
+              {Object.entries(erc721map).map(([key, value]) => (
                 <ListItemERC721 key={key} transaction={value}></ListItemERC721>
               ))}
             </tbody>

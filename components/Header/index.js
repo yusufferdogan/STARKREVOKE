@@ -77,7 +77,7 @@ function Header() {
                     className={styles.myButton0}
                     onClick={disconnectWallet}
                   >
-                    {address.substring(0, 4) +
+                    {address.substring(0, 6) +
                       '..' +
                       address.substring(
                         address.length - 4,
