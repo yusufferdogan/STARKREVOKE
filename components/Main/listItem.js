@@ -22,23 +22,27 @@ export function ListItemERC20({ transaction, allowance }) {
   }, []);
 
   async function sendTx() {
-    const starknet = await connect({ showList: false });
+    try {
+      const starknet = await connect({ showList: false });
 
-    await starknet.enable();
+      await starknet.enable();
 
-    const provider = new Provider({
-      sequencer: { network: constants.NetworkName.SN_GOERLI },
-    });
+      const provider = new Provider({
+        sequencer: { network: constants.NetworkName.SN_GOERLI },
+      });
 
-    const result = await starknet.account.execute({
-      contractAddress: transaction.contract_address,
-      entrypoint: 'approve',
-      calldata: CallData.compile({
-        spender: address,
-        amount: cairo.uint256(0n),
-      }),
-    });
-    provider.waitForTransaction(result.transaction_hash).then(console.log);
+      const result = await starknet.account.execute({
+        contractAddress: transaction.contract_address,
+        entrypoint: 'approve',
+        calldata: CallData.compile({
+          spender: address,
+          amount: cairo.uint256(0n),
+        }),
+      });
+      provider.waitForTransaction(result.transaction_hash).then(console.log);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   const date = convertSecondsToDate(transaction.timestamp);

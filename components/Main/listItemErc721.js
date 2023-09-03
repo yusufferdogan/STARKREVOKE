@@ -19,11 +19,11 @@ export function ListItemERC721({ transaction }) {
       const starknet = await connect({ showList: false });
 
       await starknet.enable();
-  
+
       const provider = new Provider({
         sequencer: { network: constants.NetworkName.SN_GOERLI },
       });
-  
+
       const result = await starknet.account.execute({
         contractAddress: transaction.contract_address,
         entrypoint: 'setApprovalForAll',
@@ -33,10 +33,9 @@ export function ListItemERC721({ transaction }) {
         }),
       });
       provider.waitForTransaction(result.transaction_hash).then(console.log);
-    }catch(e){
+    } catch (e) {
       console.log(e);
     }
-
   }
 
   if (transaction.isSetApprovalForAll && transaction.tokenId == '0x0')
