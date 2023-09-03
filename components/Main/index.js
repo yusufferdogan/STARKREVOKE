@@ -1,11 +1,9 @@
 import { React, useEffect, useState } from 'react';
 import 'tailwindcss/tailwind.css';
-import { useAccount } from '@starknet-react/core';
 import { ListItemERC20 } from './listItem';
 import { ListItemERC721 } from './listItemErc721';
 import { IoLogoGithub } from 'react-icons/io';
 
-require('dotenv').config();
 function Home() {
   const [connected, setConnected] = useState(false);
   const [address, setAddress] = useState('');
@@ -74,25 +72,6 @@ function Home() {
               </tr>
             </thead>
             <tbody className="">
-              <button
-                onClick={async () => {
-                  try {
-                    const response = await fetch(
-                      `/api/transactions?id=${address}`
-                    );
-                    if (!response.ok) {
-                      throw new Error('Request failed');
-                    }
-                    const data = await response.json();
-                    // setTransactions(data);
-                    return data;
-                  } catch (error) {
-                    throw new Error('Error fetching data: ' + error.message);
-                  }
-                }}
-              >
-                TRY
-              </button>
               {Object.entries(erc20map).map(([key, value]) => (
                 <ListItemERC20
                   key={key}

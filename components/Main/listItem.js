@@ -1,8 +1,8 @@
-import { React, useEffect, useState ,useMemo} from 'react';
+import { React, useEffect, useState, useMemo } from 'react';
 import { SPENDERS } from '../../constants/spenders';
-import {
-  useContractWrite,
-} from '@starknet-react/core';
+import { connect } from '@argent/get-starknet';
+import { Account, Provider, constants, CallData, cairo } from 'starknet';
+
 import {
   convertSecondsToDate,
   currency,
@@ -10,26 +10,36 @@ import {
   insertCharAt,
   unitValue,
 } from './utils';
-export function ListItemERC20({ transaction,allowance }) {
+export function ListItemERC20({ transaction, allowance }) {
   const [address, setAddress] = useState('');
 
   useEffect(() => {
+    // or try to connect to an approved wallet silently (on mount probably)
     const savedAddress = sessionStorage.getItem('address');
     if (savedAddress) {
       setAddress(savedAddress);
     }
   }, []);
 
-  const calls = useMemo(() => {
-    const tx = {
+  async function sendTx() {
+    const starknet = await connect({ showList: false });
+
+    await starknet.enable();
+
+    const provider = new Provider({
+      sequencer: { network: constants.NetworkName.SN_GOERLI },
+    });
+
+    const result = await starknet.account.execute({
       contractAddress: transaction.contract_address,
       entrypoint: 'approve',
-      calldata: [transaction.spender, 0, 0],
-    };
-    return Array(1).fill(tx);
-  }, [transaction.contract_address, transaction.spender]);
-
-  const { write } = useContractWrite({ calls });
+      calldata: CallData.compile({
+        spender: address,
+        amount: cairo.uint256(0n),
+      }),
+    });
+    provider.waitForTransaction(result.transaction_hash).then(console.log);
+  }
 
   const date = convertSecondsToDate(transaction.timestamp);
   const spender = SPENDERS.find(
@@ -96,7 +106,7 @@ export function ListItemERC20({ transaction,allowance }) {
       </td>
       <td className="px-6 py-4">
         <button
-          onClick={write}
+          onClick={sendTx}
           type="button"
           className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
         >
