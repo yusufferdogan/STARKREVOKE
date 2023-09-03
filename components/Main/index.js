@@ -3,15 +3,17 @@ import 'tailwindcss/tailwind.css';
 import { ListItemERC20 } from './listItem';
 import { ListItemERC721 } from './listItemErc721';
 import { IoLogoGithub } from 'react-icons/io';
-
+import { Loader } from './utils';
 function Home() {
   const [connected, setConnected] = useState(false);
   const [address, setAddress] = useState('');
   const [erc20map, setERC20map] = useState({});
   const [erc721map, setERC721map] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async (addr) => {
+      setIsLoading(true);
       try {
         const response = await fetch(`/api/transactions?id=${addr}`);
         if (!response.ok) {
@@ -22,6 +24,7 @@ function Home() {
         sessionStorage.setItem('er721', data.erc721);
         setERC20map(data.erc20);
         setERC721map(data.erc721);
+        setIsLoading(false);
         return data;
       } catch (error) {
         throw new Error('Error fetching data: ' + error.message);
@@ -71,18 +74,25 @@ function Home() {
                 </th>
               </tr>
             </thead>
-            <tbody className="">
-              {Object.entries(erc20map).map(([key, value]) => (
-                <ListItemERC20
-                  key={key}
-                  transaction={value.transaction}
-                  allowance={value.allowance}
-                ></ListItemERC20>
-              ))}
-              {Object.entries(erc721map).map(([key, value]) => (
-                <ListItemERC721 key={key} transaction={value}></ListItemERC721>
-              ))}
-            </tbody>
+            {isLoading ? (
+              <Loader></Loader>
+            ) : (
+              <tbody className="">
+                {Object.entries(erc20map).map(([key, value]) => (
+                  <ListItemERC20
+                    key={key}
+                    transaction={value.transaction}
+                    allowance={value.allowance}
+                  ></ListItemERC20>
+                ))}
+                {Object.entries(erc721map).map(([key, value]) => (
+                  <ListItemERC721
+                    key={key}
+                    transaction={value}
+                  ></ListItemERC721>
+                ))}
+              </tbody>
+            )}
           </table>
         </div>
       </div>
