@@ -27,7 +27,8 @@ function Home() {
         setIsLoading(false);
         return data;
       } catch (error) {
-        throw new Error('Error fetching data: ' + error.message);
+        alert('An Error occurred ,Please refresh the page');
+        // throw new Error('Error fetching data: ' + error.message);
       }
     };
     const isConnected = sessionStorage.getItem('connected') === 'true';
@@ -76,6 +77,12 @@ function Home() {
             </thead>
             {isLoading ? (
               <Loader></Loader>
+            ) : connected &&
+              Object.entries(erc20map).length === 0 &&
+              Object.entries(erc721map).length === 0 ? (
+              <tbody>
+                <p className='p-5'>NO ALLOWANCE EXISTS</p>
+              </tbody>
             ) : (
               <tbody className="">
                 {Object.entries(erc20map).map(([key, value]) => (
