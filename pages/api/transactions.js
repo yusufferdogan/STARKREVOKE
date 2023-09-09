@@ -63,36 +63,39 @@ export default async function handler(req, res) {
     // console.log('transactions JS');
     // console.log('erc20:', obj.erc20);
     // console.log('erc721:', obj.erc721);
-    
-    console.log(process.env.ALCHEMY_URL)
+
+    // console.log(process.env.ALCHEMY_URL)
     const provider = new RpcProvider({
-      nodeUrl: process.env.ALCHEMY_URL
+      nodeUrl: process.env.ALCHEMY_URL,
     });
 
     const wrappedERC20 = {};
-
-    for (const [key, transaction] of Object.entries(obj.erc20)) {
-      const myTestContract = new Contract(
-        ABI,
-        transaction.contract_address,
-        provider
-      );
-      const allowance = await myTestContract.allowance(
-        contract_address,
-        transaction.spender
-      );
-      const bnAllowance = uint256ToBN(allowance.remaining);
-      if (bnAllowance === 0n) {
-      } else
-        wrappedERC20[key] = {
-          allowance: bnAllowance.toString(),
-          transaction: transaction,
-        };
+    try {
+      for (const [key, transaction] of Object.entries(obj.erc20)) {
+        const myTestContract = new Contract(
+          ABI,
+          transaction.contract_address,
+          provider
+        );
+        const allowance = await myTestContract.allowance(
+          contract_address,
+          transaction.spender
+        );
+        const bnAllowance = uint256ToBN(allowance.remaining);
+        if (bnAllowance === 0n) {
+        } else
+          wrappedERC20[key] = {
+            allowance: bnAllowance.toString(),
+            transaction: transaction,
+          };
+      }
+    } catch (err) {
+      console.error(err);
     }
 
-    for (const [key, value] of Object.entries(wrappedERC20)) {
-      console.log(value.transaction, value.allowance);
-    }
+    // for (const [key, value] of Object.entries(wrappedERC20)) {
+    //   console.log(value.transaction, value.allowance);
+    // }
 
     // Return the resource data as a JSON response
     res.status(200).json({ erc20: wrappedERC20, erc721: obj.erc721 });

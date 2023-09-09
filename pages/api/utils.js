@@ -45,7 +45,7 @@ export function filterAddresses(transactions) {
             name: null,
             symbol: null,
           };
-          console.log("ERC721 OBJ: ", obj);
+          // console.log("ERC721 OBJ: ", obj);
           if (obj.tokenId == '0x0') {
             // console.log('ERC721 deleted: ', obj.spender);
             delete erc721[obj.contract_address.concat(obj.spender)];
