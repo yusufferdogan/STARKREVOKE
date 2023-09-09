@@ -20,25 +20,40 @@ function Home() {
           throw new Error('Request failed');
         }
         const data = await response.json();
-        sessionStorage.setItem('erc20', data.erc20);
-        sessionStorage.setItem('er721', data.erc721);
+        // sessionStorage.setItem('erc20', data.erc20);
+        // sessionStorage.setItem('er721', data.erc721);
         setERC20map(data.erc20);
         setERC721map(data.erc721);
         setIsLoading(false);
         return data;
       } catch (error) {
         alert('An Error occurred ,Please refresh the page');
+        console.log('Error fetching data: ' + error.message);
         // throw new Error('Error fetching data: ' + error.message);
       }
     };
-    const isConnected = sessionStorage.getItem('connected') === 'true';
-    const savedAddress = sessionStorage.getItem('address');
-    if (isConnected && savedAddress) {
-      setConnected(true);
-      setAddress(savedAddress);
-      if (address) fetchData(address);
+
+    setInterval(function () {
+      if (sessionStorage.getItem('connected') !== 'true') {
+        setConnected(false);
+        setAddress('');
+        setERC20map({});
+        setERC721map({});
+      } else {
+        if (sessionStorage.getItem('connected') === 'true') {
+          const savedAddress = sessionStorage.getItem('address');
+          setConnected(true);
+          setAddress(savedAddress);
+        }
+      }
+    }, 1000);
+
+    // Call fetchData only when the component first mounts
+    if (address !== '' && connected) {
+      fetchData(address);
     }
-  }, [address]);
+  }, [address, connected]);
+
   return (
     <div className="min-w-full">
       <div className="overflow-y-scroll" style={{ maxHeight: '79vh' }}>
@@ -81,7 +96,7 @@ function Home() {
               Object.entries(erc20map).length === 0 &&
               Object.entries(erc721map).length === 0 ? (
               <tbody>
-                <p className='p-5'>NO ALLOWANCE EXISTS</p>
+                <p className="p-5">NO ALLOWANCE EXISTS</p>
               </tbody>
             ) : (
               <tbody className="">
