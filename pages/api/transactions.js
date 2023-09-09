@@ -45,7 +45,6 @@ export default async function handler(req, res) {
 
       for (let index = 0; index < response.data.data.length; index++) {
         const element = response.data.data[index];
-        console.log(element.nonce);
         data.push(element);
       }
 
@@ -60,38 +59,32 @@ export default async function handler(req, res) {
     );
 
     const obj = filterAddresses(data.reverse());
-    // console.log('transactions JS');
-    // console.log('erc20:', obj.erc20);
-    // console.log('erc721:', obj.erc721);
-    
-    console.log(process.env.ALCHEMY_URL)
     const provider = new RpcProvider({
-      nodeUrl: process.env.ALCHEMY_URL
+      nodeUrl: process.env.ALCHEMY_URL,
     });
 
     const wrappedERC20 = {};
-
-    for (const [key, transaction] of Object.entries(obj.erc20)) {
-      const myTestContract = new Contract(
-        ABI,
-        transaction.contract_address,
-        provider
-      );
-      const allowance = await myTestContract.allowance(
-        contract_address,
-        transaction.spender
-      );
-      const bnAllowance = uint256ToBN(allowance.remaining);
-      if (bnAllowance === 0n) {
-      } else
-        wrappedERC20[key] = {
-          allowance: bnAllowance.toString(),
-          transaction: transaction,
-        };
-    }
-
-    for (const [key, value] of Object.entries(wrappedERC20)) {
-      console.log(value.transaction, value.allowance);
+    try {
+      for (const [key, transaction] of Object.entries(obj.erc20)) {
+        const myTestContract = new Contract(
+          ABI,
+          transaction.contract_address,
+          provider
+        );
+        const allowance = await myTestContract.allowance(
+          contract_address,
+          transaction.spender
+        );
+        const bnAllowance = uint256ToBN(allowance.remaining);
+        if (bnAllowance === 0n) {
+        } else
+          wrappedERC20[key] = {
+            allowance: bnAllowance.toString(),
+            transaction: transaction,
+          };
+      }
+    } catch (e) {
+      console.error(e);
     }
 
     // Return the resource data as a JSON response

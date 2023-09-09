@@ -25,11 +25,9 @@ export function filterAddresses(transactions) {
               blockNumber: account_call.block_number,
             };
             if (obj.amount.low == '0x0' && obj.amount.high == '0x0') {
-              // console.log('skipped:', obj.spender);
               delete erc20[obj.contract_address.concat(obj.spender)];
             } else {
-              // Assuming updateErc20Map is a function to update properties on the obj
-              erc20[obj.contract_address.concat(obj.spender)] = obj; // Replace 'newValue' with the actual value you want to add
+              erc20[obj.contract_address.concat(obj.spender)] = obj;
             }
           }
         }
@@ -45,9 +43,7 @@ export function filterAddresses(transactions) {
             name: null,
             symbol: null,
           };
-          console.log("ERC721 OBJ: ", obj);
           if (obj.tokenId == '0x0') {
-            // console.log('ERC721 deleted: ', obj.spender);
             delete erc721[obj.contract_address.concat(obj.spender)];
           } else erc721[obj.contract_address.concat(obj.spender)] = obj;
         }
