@@ -1,11 +1,56 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ConnectWallet } from './utils';
 import Image from 'next/image';
-import Logo from '../../constants/images/logo.svg';
 import { ToastContainer, toast } from 'react-toastify';
-import { IoLogoGithub } from 'react-icons/io';
+import { connect, disconnect } from '@argent/get-starknet';
+import styles from './Header.module.css';
 function Header() {
+  const [connected, setConnected] = useState(false);
+  const [address, setAddress] = useState('');
+
+  useEffect(() => {
+    const isConnected = sessionStorage.getItem('connected') === 'true';
+    const savedAddress = sessionStorage.getItem('address');
+    if (isConnected && savedAddress) {
+      setConnected(true);
+      setAddress(savedAddress);
+    }
+  }, []);
+
+  const connectWallet = async () => {
+    try {
+      const connection = await connect();
+      if (connection && connection.isConnected) {
+        setConnected(true);
+        setAddress(connection.selectedAddress);
+        sessionStorage.setItem('connected', 'true');
+        sessionStorage.setItem('address', connection.selectedAddress);
+      }
+    } catch (error) {
+      console.error('Failed to connect wallet:', error);
+    }
+  };
+
+  const disconnectWallet = async () => {
+    try {
+      await disconnect();
+      sessionStorage.removeItem('connected');
+      sessionStorage.removeItem('address');
+      setConnected(false);
+      setAddress('');
+    } catch (error) {
+      console.error('Failed to disconnect wallet:', error);
+    }
+  };
+
+  const handleConnectButton = () => {
+    if (connected) {
+      disconnectWallet();
+    } else {
+      connectWallet();
+    }
+  };
+
   return (
     <header aria-label="Site Header">
       <ToastContainer autoClose={false} draggable={false} />
@@ -15,7 +60,6 @@ function Header() {
             <Link href="/">
               <div className="block text-white font-extrabold items-center">
                 <span className="sr-only">Home</span>
-                {/* <p className="pl-10">Revoke Starknet</p> */}
                 <Image
                   src={'/logo.png'}
                   alt=""
@@ -27,7 +71,25 @@ function Header() {
           </div>
           <div className="flex items-center">
             <div className="pr-10">
-              <ConnectWallet></ConnectWallet>
+              {connected ? (
+                <div>
+                  <button
+                    className={styles.myButton0}
+                    onClick={disconnectWallet}
+                  >
+                    {address.substring(0, 6) +
+                      '..' +
+                      address.substring(
+                        address.length - 4,
+                        address.length
+                      )}{' '}
+                  </button>
+                </div>
+              ) : (
+                <button className={styles.myButton} onClick={connectWallet}>
+                  CONNECT
+                </button>
+              )}
             </div>
           </div>
           <div className="block md:hidden">

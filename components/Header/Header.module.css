@@ -2,3 +2,69 @@
     background-color: black; /* Change the color here */
     z-index: 50;
 }
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+
+.myButton {
+  position: relative;
+  padding: 6px 18px;
+  margin: 10px 0;
+  color: #03e9f4;
+  font-size: 1.0em;
+  letter-spacing: 2px;
+  font-family: "Roboto";
+  cursor: pointer;
+  display: inline-block;
+  -webkit-box-reflect: below 1px linear-gradient(transparent, #0005);
+  border-radius: 15px;
+}
+
+.myButton:hover {
+  background-color: #0353f4;
+  color: #03e9f4;
+  box-shadow: 0 0 5px #03e9f4, 0 0 25px #03e9f4, 0 0 50px #03e9f4,
+    0 0 200px #03e9f4;
+    transition: 0.1s;
+}
+.myButton2 {
+  position: relative;
+  padding: 12px 36px;
+  margin: 10px 0;
+  color: #0394f4;
+  font-size: 1.4em;
+  letter-spacing: 2px;
+  font-family: "Roboto";
+  cursor: pointer;
+  display: inline-block;
+  text-transform: uppercase;
+  -webkit-box-reflect: below 1px linear-gradient(transparent, #0005);
+}
+.myButton2:hover {
+  background-color: #9a05a4;
+  color: #fefefe;
+  box-shadow: 0 0 5px #03e9f4, 0 0 25px #03e9f4, 0 0 50px #03e9f4,
+    0 0 200px #29e0ea;
+    transition: 0.1s;
+}
+
+.myButton0 {
+  position: relative;
+  padding: 6px 18px;
+  margin: 10px 0;
+  color: #03e9f4;
+  font-size: 1.0em;
+  letter-spacing: 1px;
+  font-family: "Roboto";
+  cursor: pointer;
+  display: inline-block;
+  text-transform: uppercase;
+  -webkit-box-reflect: below 1px linear-gradient(transparent, #0005);
+  border-radius: 15px;
+}
+
+.myButton0:hover {
+  background-color: #a803f4;
+  color: #03e9f4;
+  box-shadow: 0 0 5px #03e9f4, 0 0 25px #03e9f4, 0 0 50px #03e9f4,
+    0 0 200px #03e9f4;
+    transition: 0.1s;
+}

@@ -1,50 +1,63 @@
-import React from 'react';
-import { useMemo } from 'react';
+import { React, useEffect, useState } from 'react';
 import { SPENDERS } from '../../constants/spenders';
-import {
-  useContractRead,
-  useAccount,
-  useContractWrite,
-} from '@starknet-react/core';
-import { ERC20_ABI } from '../../constants/abi';
+import { connect } from '@argent/get-starknet';
+import { RpcProvider, CallData, cairo } from 'starknet';
+require('dotenv').config();
+
 import {
   convertSecondsToDate,
   currency,
   icon,
   insertCharAt,
-  uint256ToBN,
   unitValue,
 } from './utils';
-export function ListItemERC20({ transaction }) {
-  const { address, status } = useAccount();
-  const { data, isLoading, error, refetch } = useContractRead({
-    address: transaction.contract_address,
-    abi: ERC20_ABI.abi,
-    functionName: 'allowance',
-    args: [address, transaction.spender],
-    watch: false,
-  });
-  const calls = useMemo(() => {
-    const tx = {
-      contractAddress: transaction.contract_address,
-      entrypoint: 'approve',
-      calldata: [transaction.spender, 0, 0],
-    };
-    return Array(1).fill(tx);
-  }, [transaction.contract_address, transaction.spender]);
+export function ListItemERC20({ transaction, allowance }) {
+  const [address, setAddress] = useState('');
 
-  const { write } = useContractWrite({ calls });
+  useEffect(() => {
+    // or try to connect to an approved wallet silently (on mount probably)
+    const savedAddress = sessionStorage.getItem('address');
+    if (savedAddress) {
+      setAddress(savedAddress);
+    }
+  }, []);
 
-  if (isLoading) return null;
-  if (error) return <span>Error: {JSON.stringify(error)}</span>;
-  if (data === undefined) return <span>data is undefined...</span>;
-  const num = BigInt(uint256ToBN(data?.remaining));
-  if (num === 0n) return null;
+  async function sendTx() {
+    try {
+      const starknet = await connect({ showList: false });
+
+      await starknet.enable();
+
+      const provider = new RpcProvider({
+        nodeUrl: process.env.ALCHEMY_URL,
+      });
+
+      const result = await starknet.account.execute({
+        contractAddress: transaction.contract_address,
+        entrypoint: 'approve',
+        calldata: CallData.compile({
+          spender: transaction.spender,
+          amount: cairo.uint256(0n),
+        }),
+      });
+      provider.account
+        .waitForTransaction(result.transaction_hash)
+        .then((receipt) => {
+          console.log(receipt);
+        })
+        .catch((error) => {
+          console.error('Error waiting for transaction:', error);
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   const date = convertSecondsToDate(transaction.timestamp);
   const spender = SPENDERS.find(
     (sp) => sp.contract_address === insertCharAt(transaction.spender, '0', 2)
   );
+
   return (
     <tr
       className="border-b rounded-lg 
@@ -73,7 +86,7 @@ export function ListItemERC20({ transaction }) {
         </a>
       </th>
       <td className="px-6 py-4 text-white">
-        {unitValue(transaction, num)}
+        {unitValue(transaction, allowance)}
         <span>
           &nbsp;
           {currency[transaction.contract_address] === undefined
@@ -106,7 +119,7 @@ export function ListItemERC20({ transaction }) {
       </td>
       <td className="px-6 py-4">
         <button
-          onClick={write}
+          onClick={sendTx}
           type="button"
           className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
         >

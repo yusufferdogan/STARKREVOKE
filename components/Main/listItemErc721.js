@@ -1,10 +1,11 @@
 import { BigNumber } from 'ethers';
-import { useContractWrite } from '@starknet-react/core';
-import React from 'react';
-import { useMemo } from 'react';
+import React, { useState } from 'react';
 import { nftData } from '../../constants/nftData';
 import { SPENDERS } from '../../constants/spenders';
 import { convertSecondsToDate, insertCharAt, substr } from './utils';
+import { RpcProvider, CallData, cairo } from 'starknet';
+import { connect } from '@argent/get-starknet';
+require('dotenv').config();
 
 export function ListItemERC721({ transaction }) {
   const targetNft = nftData.find(
@@ -14,34 +15,36 @@ export function ListItemERC721({ transaction }) {
     (sp) => sp.contract_address === insertCharAt(transaction.spender, '0', 2)
   );
 
-  const calls_approve = useMemo(() => {
-    const tx = {
-      contractAddress: transaction.contract_address,
-      entrypoint: 'approve',
-      calldata: [0, transaction.tokenId, 0],
-    };
-    return Array(1).fill(tx);
-  }, [transaction.contract_address, transaction.tokenId]);
+  async function sendTx() {
+    try {
+      const starknet = await connect({ showList: false });
 
-  const { write: approveWrite } = useContractWrite({ calls: calls_approve });
-  const calls_setApproveForAll = useMemo(() => {
-    const tx = {
-      contractAddress: transaction.contract_address,
-      entrypoint: 'setApprovalForAll',
-      calldata: [transaction.spender, 0],
-    };
-    return Array(1).fill(tx);
-  }, [transaction.contract_address, transaction.spender]);
+      await starknet.enable();
 
-  const { write: setApproveForAllWrite } = useContractWrite({
-    calls: calls_setApproveForAll,
-  });
+      const provider = new RpcProvider({
+        nodeUrl: process.env.ALCHEMY_URL,
+      });
 
-  if (transaction.isSetApprovalForAll && transaction.tokenId == '0x0')
-    return null;
-
-  if (!transaction.isSetApprovalForAll && transaction.spender == '0x0')
-    return null;
+      const result = await starknet.account.execute({
+        contractAddress: transaction.contract_address,
+        entrypoint: 'setApprovalForAll',
+        calldata: CallData.compile({
+          operator: transaction.spender,
+          approved: cairo.felt(0n),
+        }),
+      });
+      provider.account
+        .waitForTransaction(result.transaction_hash)
+        .then((receipt) => {
+          console.log(receipt);
+        })
+        .catch((error) => {
+          console.error('Error waiting for transaction:', error);
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   return (
     <tr
@@ -112,11 +115,7 @@ export function ListItemERC721({ transaction }) {
       </td>
       <td className="px-6 py-4">
         <button
-          onClick={
-            transaction.isSetApprovalForAll
-              ? setApproveForAllWrite
-              : approveWrite
-          }
+          onClick={sendTx}
           type="button"
           className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
         >

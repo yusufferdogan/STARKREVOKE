@@ -70,7 +70,28 @@ export function unitValue(transaction, num) {
   }
 }
 export function substr(str) {
-    return (
-      str.substring(0, 4) + '...' + str.substring(str.length - 4, str.length)
-    );
-  }
+  return (
+    str.substring(0, 4) + '...' + str.substring(str.length - 4, str.length)
+  );
+}
+
+export function Loader() {
+  return (
+    <tr>
+      <td className=""></td>
+      <td className=""></td>
+      <td className="">
+        <div className="flex items-center justify-center py-5 min-w-screen">
+          <div className="flex space-x-2 animate-pulse">
+            <div className="w-3 h-3 bg-gray-500 rounded-full" />
+            <div className="w-3 h-3 bg-gray-500 rounded-full" />
+            <div className="w-3 h-3 bg-gray-500 rounded-full" />
+          </div>
+        </div>
+      </td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  );
+}
