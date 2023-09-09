@@ -1,10 +1,11 @@
 import { BigNumber } from 'ethers';
-import React from 'react';
+import React, { useState } from 'react';
 import { nftData } from '../../constants/nftData';
 import { SPENDERS } from '../../constants/spenders';
 import { convertSecondsToDate, insertCharAt, substr } from './utils';
-import { Account, Provider, constants, CallData, cairo } from 'starknet';
+import { RpcProvider, CallData, cairo } from 'starknet';
 import { connect } from '@argent/get-starknet';
+require('dotenv').config();
 
 export function ListItemERC721({ transaction }) {
   const targetNft = nftData.find(
@@ -20,8 +21,8 @@ export function ListItemERC721({ transaction }) {
 
       await starknet.enable();
 
-      const provider = new Provider({
-        sequencer: { network: constants.NetworkName.SN_GOERLI },
+      const provider = new RpcProvider({
+        nodeUrl: process.env.ALCHEMY_URL,
       });
 
       const result = await starknet.account.execute({
@@ -32,17 +33,18 @@ export function ListItemERC721({ transaction }) {
           approved: cairo.felt(0n),
         }),
       });
-      provider.waitForTransaction(result.transaction_hash).then(console.log);
+      provider.account
+        .waitForTransaction(result.transaction_hash)
+        .then((receipt) => {
+          console.log(receipt);
+        })
+        .catch((error) => {
+          console.error('Error waiting for transaction:', error);
+        });
     } catch (e) {
       console.log(e);
     }
   }
-
-  if (transaction.isSetApprovalForAll && transaction.tokenId == '0x0')
-    return null;
-
-  if (!transaction.isSetApprovalForAll && transaction.spender == '0x0')
-    return null;
 
   return (
     <tr
