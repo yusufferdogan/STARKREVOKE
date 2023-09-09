@@ -1,7 +1,8 @@
-import { React, useEffect, useState, useMemo } from 'react';
+import { React, useEffect, useState } from 'react';
 import { SPENDERS } from '../../constants/spenders';
 import { connect } from '@argent/get-starknet';
-import { Account, Provider, constants, CallData, cairo } from 'starknet';
+import { RpcProvider, CallData, cairo } from 'starknet';
+require('dotenv').config();
 
 import {
   convertSecondsToDate,
@@ -27,19 +28,26 @@ export function ListItemERC20({ transaction, allowance }) {
 
       await starknet.enable();
 
-      const provider = new Provider({
-        sequencer: { network: constants.NetworkName.SN_GOERLI },
+      const provider = new RpcProvider({
+        nodeUrl: process.env.ALCHEMY_URL,
       });
 
       const result = await starknet.account.execute({
         contractAddress: transaction.contract_address,
         entrypoint: 'approve',
         calldata: CallData.compile({
-          spender: address,
+          spender: transaction.spender,
           amount: cairo.uint256(0n),
         }),
       });
-      provider.waitForTransaction(result.transaction_hash).then(console.log);
+      provider.account
+        .waitForTransaction(result.transaction_hash)
+        .then((receipt) => {
+          console.log(receipt);
+        })
+        .catch((error) => {
+          console.error('Error waiting for transaction:', error);
+        });
     } catch (e) {
       console.log(e);
     }
@@ -49,6 +57,7 @@ export function ListItemERC20({ transaction, allowance }) {
   const spender = SPENDERS.find(
     (sp) => sp.contract_address === insertCharAt(transaction.spender, '0', 2)
   );
+
   return (
     <tr
       className="border-b rounded-lg 
