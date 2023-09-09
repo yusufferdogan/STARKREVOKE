@@ -14,7 +14,6 @@
   font-family: "Roboto";
   cursor: pointer;
   display: inline-block;
-  text-transform: lowercase;
   -webkit-box-reflect: below 1px linear-gradient(transparent, #0005);
   border-radius: 15px;
 }

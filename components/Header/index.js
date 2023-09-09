@@ -87,7 +87,7 @@ function Header() {
                 </div>
               ) : (
                 <button className={styles.myButton} onClick={connectWallet}>
-                  Connect
+                  CONNECT
                 </button>
               )}
             </div>
