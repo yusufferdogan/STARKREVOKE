@@ -64,6 +64,7 @@ export default async function handler(req, res) {
     // console.log('erc20:', obj.erc20);
     // console.log('erc721:', obj.erc721);
     
+    console.log(process.env.ALCHEMY_URL)
     const provider = new RpcProvider({
       nodeUrl: process.env.ALCHEMY_URL
     });
