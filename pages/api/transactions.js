@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Provider, Contract, Account, ec, json } from 'starknet';
+import { Provider, Contract, Account, ec, json, RpcProvider } from 'starknet';
 import { filterAddresses } from './utils';
 import { SequencerProvider, constants } from 'starknet';
 import ABI from './abi.json' assert { type: 'json' };
@@ -60,12 +60,12 @@ export default async function handler(req, res) {
     );
 
     const obj = filterAddresses(data.reverse());
-    console.log('transactions JS');
-    console.log('erc20:', obj.erc20);
-    console.log('erc721:', obj.erc721);
-
-    const provider = new Provider({
-      sequencer: { network: constants.NetworkName.SN_MAIN },
+    // console.log('transactions JS');
+    // console.log('erc20:', obj.erc20);
+    // console.log('erc721:', obj.erc721);
+    
+    const provider = new RpcProvider({
+      nodeUrl: process.env.ALCHEMY_URL
     });
 
     const wrappedERC20 = {};
