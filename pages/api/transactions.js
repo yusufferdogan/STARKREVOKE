@@ -48,7 +48,7 @@ export default async function handler(req, res) {
         data.push(element);
       }
 
-      if (next_url) await sleep(1000);
+      if (next_url) await sleep(500);
       if (next_url === undefined || next_url === null) break;
     } while (1);
 
