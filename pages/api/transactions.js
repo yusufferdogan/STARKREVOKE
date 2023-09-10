@@ -64,33 +64,29 @@ export default async function handler(req, res) {
     });
 
     const wrappedERC20 = {};
-    try {
-      for (const [key, transaction] of Object.entries(obj.erc20)) {
-        const myTestContract = new Contract(
-          ABI,
-          transaction.contract_address,
-          provider
-        );
-        const allowance = await myTestContract.allowance(
-          contract_address,
-          transaction.spender
-        );
-        const bnAllowance = uint256ToBN(allowance.remaining);
-        if (bnAllowance === 0n) {
-        } else
-          wrappedERC20[key] = {
-            allowance: bnAllowance.toString(),
-            transaction: transaction,
-          };
-      }
-    } catch (e) {
-      console.error(e);
+    for (const [key, transaction] of Object.entries(obj.erc20)) {
+      const myTestContract = new Contract(
+        ABI,
+        transaction.contract_address,
+        provider
+      );
+      const allowance = await myTestContract.allowance(
+        contract_address,
+        transaction.spender
+      );
+      const bnAllowance = uint256ToBN(allowance.remaining);
+      if (bnAllowance === 0n) {
+      } else
+        wrappedERC20[key] = {
+          allowance: bnAllowance.toString(),
+          transaction: transaction,
+        };
     }
 
     // Return the resource data as a JSON response
     res.status(200).json({ erc20: wrappedERC20, erc721: obj.erc721 });
   } catch (error) {
-    console.error('Error fetching resource:', error);
-    res.status(500).send('Error fetching resource');
+    console.error('Error fetching resource:', error.message);
+    res.status(500).send('Error fetching resource' + error.message);
   }
 }
