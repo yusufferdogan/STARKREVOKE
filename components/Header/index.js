@@ -7,6 +7,15 @@ import styles from './Header.module.css';
 function Header() {
   const [connected, setConnected] = useState(false);
   const [address, setAddress] = useState('');
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
 
   useEffect(() => {
     const isConnected = sessionStorage.getItem('connected') === 'true';
@@ -74,15 +83,16 @@ function Header() {
               {connected ? (
                 <div>
                   <button
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
                     className={styles.myButton0}
                     onClick={disconnectWallet}
                   >
-                    {address.substring(0, 6) +
-                      '..' +
-                      address.substring(
-                        address.length - 4,
-                        address.length
-                      )}{' '}
+                    {isHovered
+                      ? 'DISCONNECT'
+                      : address.substring(0, 6) +
+                        '..' +
+                        address.substring(address.length - 4, address.length)}
                   </button>
                 </div>
               ) : (
