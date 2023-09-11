@@ -75,6 +75,8 @@ export function ListItemERC20({ transaction, allowance }) {
         />
         <a
           className="text-white pl-3"
+          target="_blank"
+          rel="noopener noreferrer"
           href={`https://starkscan.co/contract/${transaction.contract_address}`}
         >
           {transaction.contract_address.substring(0, 4) +
@@ -95,7 +97,11 @@ export function ListItemERC20({ transaction, allowance }) {
         </span>
       </td>
       <td className="px-6 py-4 text-white">
-        <a href={`https://starkscan.co/contract/${transaction.spender}`}>
+        <a
+          target="_blank"
+          rel="noopener noreferrer 2"
+          href={`https://starkscan.co/contract/${transaction.spender}`}
+        >
           {spender
             ? spender.name_tag
             : transaction.spender.substring(0, 4) +
