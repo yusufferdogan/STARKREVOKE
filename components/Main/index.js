@@ -197,8 +197,11 @@ function Home() {
                 ))}
                 {Object.entries(erc721map).map(([key, value]) => (
                   <ListItemERC721
+                    id={key}
                     key={key}
                     transaction={value}
+                    toggle={updateSelected}
+                    selected={selected[key] || false}
                   ></ListItemERC721>
                 ))}
               </tbody>
