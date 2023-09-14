@@ -3,48 +3,16 @@ import React, { useState } from 'react';
 import { nftData } from '../../constants/nftData';
 import { SPENDERS } from '../../constants/spenders';
 import { convertSecondsToDate, insertCharAt, substr } from './utils';
-import { RpcProvider, CallData, cairo } from 'starknet';
-import { connect } from '@argent/get-starknet';
 require('dotenv').config();
+import { AiFillCheckCircle } from 'react-icons/ai';
 
-export function ListItemERC721({ transaction }) {
+export function ListItemERC721({ transaction, id, toggle, selected }) {
   const targetNft = nftData.find(
     (nft) => nft.contract_address === transaction.contract_address
   );
   const spender = SPENDERS.find(
     (sp) => sp.contract_address === insertCharAt(transaction.spender, '0', 2)
   );
-
-  async function sendTx() {
-    try {
-      const starknet = await connect({ showList: false });
-
-      await starknet.enable();
-
-      const provider = new RpcProvider({
-        nodeUrl: process.env.ALCHEMY_URL,
-      });
-
-      const result = await starknet.account.execute({
-        contractAddress: transaction.contract_address,
-        entrypoint: 'setApprovalForAll',
-        calldata: CallData.compile({
-          operator: transaction.spender,
-          approved: cairo.felt(0n),
-        }),
-      });
-      provider.account
-        .waitForTransaction(result.transaction_hash)
-        .then((receipt) => {
-          console.log(receipt);
-        })
-        .catch((error) => {
-          console.error('Error waiting for transaction:', error);
-        });
-    } catch (e) {
-      console.log(e);
-    }
-  }
 
   return (
     <tr
@@ -56,7 +24,8 @@ export function ListItemERC721({ transaction }) {
     >
       <th
         scope="row"
-        className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
+        className="flex items-center px-6 py-4
+         text-gray-900 whitespace-nowrap dark:text-white"
       >
         {transaction.hasOwnProperty('image_url') && targetNft.image_url ? (
           /* eslint-disable-next-line @next/next/no-img-element */
@@ -113,13 +82,11 @@ export function ListItemERC721({ transaction }) {
           <div className="h-2.5 w-2.5 rounded-full bg-purple-500 mr-2" /> Nft
         </div>
       </td>
-      <td className="px-6 py-4">
-        <button
-          onClick={sendTx}
-          type="button"
-          className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-        >
-          Revoke
+      <td className="px-6 py-4 text-4xl">
+        <button onClick={() => toggle(id)} className="flex align-bottom">
+          <AiFillCheckCircle
+            className={selected ? 'text-blue-700 ' : 'text-4xl'}
+          />
         </button>
       </td>
     </tr>
