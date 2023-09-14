@@ -1,9 +1,6 @@
 import { React, useEffect, useState } from 'react';
 import { SPENDERS } from '../../constants/spenders';
-import { connect } from '@argent/get-starknet';
-import { RpcProvider, CallData, cairo } from 'starknet';
-require('dotenv').config();
-
+import { AiFillCheckCircle } from 'react-icons/ai';
 import {
   convertSecondsToDate,
   currency,
@@ -11,7 +8,13 @@ import {
   insertCharAt,
   unitValue,
 } from './utils';
-export function ListItemERC20({ transaction, allowance }) {
+export function ListItemERC20({
+  id,
+  transaction,
+  allowance,
+  toggle,
+  selected,
+}) {
   const [address, setAddress] = useState('');
 
   useEffect(() => {
@@ -22,36 +25,7 @@ export function ListItemERC20({ transaction, allowance }) {
     }
   }, []);
 
-  async function sendTx() {
-    try {
-      const starknet = await connect({ showList: false });
-
-      await starknet.enable();
-
-      const provider = new RpcProvider({
-        nodeUrl: process.env.ALCHEMY_URL,
-      });
-
-      const result = await starknet.account.execute({
-        contractAddress: transaction.contract_address,
-        entrypoint: 'approve',
-        calldata: CallData.compile({
-          spender: transaction.spender,
-          amount: cairo.uint256(0n),
-        }),
-      });
-      provider.account
-        .waitForTransaction(result.transaction_hash)
-        .then((receipt) => {
-          console.log(receipt);
-        })
-        .catch((error) => {
-          console.error('Error waiting for transaction:', error);
-        });
-    } catch (e) {
-      console.log(e);
-    }
-  }
+  console.log(id);
 
   const date = convertSecondsToDate(transaction.timestamp);
   const spender = SPENDERS.find(
@@ -59,13 +33,11 @@ export function ListItemERC20({ transaction, allowance }) {
   );
 
   return (
-    <tr
-      className="border-b rounded-lg 
-     hover:bg-gray-700"
-    >
+    <tr className="border-b rounded-lg">
       <th
         scope="row"
-        className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
+        className="flex items-center px-6 py-4
+         text-gray-900 whitespace-nowrap dark:text-white"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -123,13 +95,11 @@ export function ListItemERC20({ transaction, allowance }) {
           <div className="h-2.5 w-2.5 rounded-full bg-green-500 mr-2" /> Token
         </div>
       </td>
-      <td className="px-6 py-4">
-        <button
-          onClick={sendTx}
-          type="button"
-          className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-        >
-          Revoke
+      <td className="px-6 py-4 text-4xl">
+        <button onClick={() => toggle(id)} className="flex align-bottom">
+          <AiFillCheckCircle
+            className={selected ? 'text-blue-700 ' : 'text-4xl'}
+          />
         </button>
       </td>
     </tr>
