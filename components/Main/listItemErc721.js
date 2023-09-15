@@ -81,7 +81,7 @@ export function ListItemERC721({ transaction, id, toggle, selected }) {
           <div className="h-2.5 w-2.5 rounded-full bg-purple-500 mr-2" /> Nft
         </div>
       </td>
-      <td className="px-6 py-4 ">
+      <td className="px-6 py-4 pl-16">
         <button onClick={() => toggle(id)} className="flex align-bottom">
           <AiFillCheckCircle
             className={`text-4xl ${selected ? 'text-green-700' : ' '}`}
