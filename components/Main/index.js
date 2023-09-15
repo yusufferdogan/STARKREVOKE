@@ -1,15 +1,81 @@
 import { React, useEffect, useState } from 'react';
-import 'tailwindcss/tailwind.css';
 import { ListItemERC20 } from './listItem';
 import { ListItemERC721 } from './listItemErc721';
 import { IoLogoGithub } from 'react-icons/io';
 import { Loader } from './utils';
+import { connect } from '@argent/get-starknet';
+import { RpcProvider, CallData, cairo } from 'starknet';
+require('dotenv').config();
 function Home() {
   const [connected, setConnected] = useState(false);
   const [address, setAddress] = useState('');
   const [erc20map, setERC20map] = useState({});
   const [erc721map, setERC721map] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [selected, setSelected] = useState({});
+
+  const updateSelected = (key) => {
+    setSelected((prevMap) => ({
+      ...prevMap,
+      [key]: !prevMap[key],
+    }));
+  };
+
+  async function sendTx() {
+    try {
+      const starknet = await connect({ showList: false });
+
+      await starknet.enable();
+
+      const provider = new RpcProvider({
+        nodeUrl: process.env.ALCHEMY_URL,
+      });
+
+      const transactions = [];
+
+      for (const key in erc20map) {
+        if (erc20map.hasOwnProperty(key) && selected[key]) {
+          const transaction = erc20map[key].transaction;
+
+          transactions.push({
+            contractAddress: transaction.contract_address,
+            entrypoint: 'approve',
+            calldata: CallData.compile({
+              spender: transaction.spender,
+              amount: cairo.uint256(0n),
+            }),
+          });
+        }
+      }
+
+      for (const key in erc721map) {
+        if (erc721map.hasOwnProperty(key) && selected[key]) {
+          const transaction = erc721map[key];
+
+          transactions.push({
+            contractAddress: transaction.contract_address,
+            entrypoint: 'setApprovalForAll',
+            calldata: CallData.compile({
+              operator: transaction.spender,
+              approved: cairo.felt(0n),
+            }),
+          });
+        }
+      }
+
+      const result = await starknet.account.execute(transactions);
+      provider.account
+        .waitForTransaction(result.transaction_hash)
+        .then((receipt) => {
+          console.log(receipt);
+        })
+        .catch((error) => {
+          console.error('Error waiting for transaction:', error);
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   useEffect(() => {
     const fetchData = async (addr) => {
@@ -20,8 +86,6 @@ function Home() {
           throw new Error('Request failed');
         }
         const data = await response.json();
-        // sessionStorage.setItem('erc20', data.erc20);
-        // sessionStorage.setItem('er721', data.erc721);
         setERC20map(data.erc20);
         setERC721map(data.erc721);
         setIsLoading(false);
@@ -86,7 +150,22 @@ function Home() {
                   Type
                 </th>
                 <th scope="col" className="px-6 py-3">
-                  Action
+                  <button
+                    onClick={sendTx}
+                    disabled={
+                      Object.values(selected).filter((value) => value === true)
+                        .length === 0
+                    }
+                    type="button"
+                    className={`focus:outline-none text-black ${
+                      Object.values(selected).filter((value) => value === true)
+                        .length === 0
+                        ? 'bg-gray-300 text-black text-sm px-5 py-2.5 mr-2 mb-2'
+                        : 'bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2'
+                    } font-medium rounded-lg`}
+                  >
+                    REVOKE ALL
+                  </button>
                 </th>
               </tr>
             </thead>
@@ -103,14 +182,20 @@ function Home() {
                 {Object.entries(erc20map).map(([key, value]) => (
                   <ListItemERC20
                     key={key}
+                    id={key}
                     transaction={value.transaction}
                     allowance={value.allowance}
+                    toggle={updateSelected}
+                    selected={selected[key] || false}
                   ></ListItemERC20>
                 ))}
                 {Object.entries(erc721map).map(([key, value]) => (
                   <ListItemERC721
+                    id={key}
                     key={key}
                     transaction={value}
+                    toggle={updateSelected}
+                    selected={selected[key] || false}
                   ></ListItemERC721>
                 ))}
               </tbody>
@@ -124,7 +209,7 @@ function Home() {
       >
         <a
           className="text-white transition hover:text-gray-500/75"
-          href="https://github.com/yusufferdogan/REVOKE-STARKNET"
+          href="https://github.com/yusufferdogan/STARKREVOKE"
         >
           <div className="group relative m-4 flex justify-center">
             <button
