@@ -466,4 +466,41 @@ export const nftData = [
     image_url: null,
     banner_url: null,
   },
+  {
+    contract_address:
+      '0x0106c94dc954944b3893e2102d9ad5065d04a0ec9b08910891d8eedb75965334',
+    schema: 'ERC721',
+    name: 'Starknet Turkey: DeFi Adventure',
+    description: null,
+    symbol: 'EXPS',
+    external_url: null,
+    image_url: "https://bafybeibzjr34oi5mtmzani3r2h2lthq545cz32brgophxv3lnh6km27bqu.ipfs.dweb.link/6.jpg",
+    banner_url: null,
+  },
+  {
+    contract_address:
+      '0x0350479301f42225751b4d9b64e51d93ddc91d67ed96aacfab9356155bb95761',
+    schema: 'ERC721',
+    name: 'Starknet Turkey: DeFi Adventure Legendary',
+    description: null,
+    symbol: 'EXPS',
+    external_url: null,
+    image_url:
+      'https://bafybeibzjr34oi5mtmzani3r2h2lthq545cz32brgophxv3lnh6km27bqu.ipfs.dweb.link/6.jpg',
+    banner_url: null,
+  },
+  {
+    contract_address:
+      '0x048e95d3d7b12348819fa28dc43bcdf50f9774dabd4f5b622c4a25a0b7c30c45',
+    schema: 'ERC721',
+    name: 'Pyramid: Cheops',
+    description:
+      "Cheops NFT enables you to trade with zero fees and lets you mint your own NFTs at zero cost. Additionally, it's non-tradable for a limited time, helping to identify your wallet as an early adopter.",
+    symbol: 'PYRMD',
+    external_url: 'pyramid.market',
+    image_url:
+      'https://static.starkscan.co/nfts/0x048e95d3d7b12348819fa28dc43bcdf50f9774dabd4f5b622c4a25a0b7c30c45/images/QmP1MJQqPZ46MnN9EnVbiMgSDhAxANNZc3raEXciMvSmxy',
+    banner_url:
+      'https://static.starkscan.co/nfts/0x048e95d3d7b12348819fa28dc43bcdf50f9774dabd4f5b622c4a25a0b7c30c45/banners/QmYzScGfCyjc79iXFuknX2RczpJJrkc2YUD17rx7TLHrGB',
+  },
 ];

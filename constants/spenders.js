@@ -1,6 +1,20 @@
 export const SPENDERS = [
   {
     contract_address:
+      '0x0364847c4f39b869760a8b213186b5b553127e9420e594075d13d1ce8a1d9157',
+    class_hash:
+      '0x0746e3066bc46bd8019c37a37690107278ebec55020fb1b81e4f98c05fc15af9',
+    deployed_by_contract_address:
+      '0x00e340825f93764e4e0a0219324ecc5a0c76a258376c1deff75affe8397a4aa0',
+    deployed_at_transaction_hash:
+      '0x0053ea7948661d4fef25279d2aeb5772e6722c0f5f516b11ca33bb8e5ce035a3',
+    deployed_at_timestamp: 1691784979,
+    name_tag: 'Pyramid: NFT Marketplace',
+    implementation_type: 'UNKNOWN',
+    is_verified: false,
+  },
+  {
+    contract_address:
       '0x041fd22b238fa21cfcf5dd45a8548974d8263b3a531a60388411c5e230f97023',
     class_hash:
       '0x07197021c108b0cc57ae354f5ad02222c4b3d7344664e6dd602a0e2298595434',
@@ -202,5 +216,19 @@ export const SPENDERS = [
     name_tag: 'Mint Square: NFT Marketplace Manager',
     implementation_type: 'UNKNOWN',
     is_verified: true,
+  },
+  {
+    contract_address:
+      '0x04b1b3fdf34d00288a7956e6342fb366a1510a9387d321c87f3301d990ac19d4',
+    class_hash:
+      '0x066fd6e5a379895f187c2bd76132e33fd60145e301a58aac84c0638d579a51a0',
+    deployed_by_contract_address:
+      '0x02470ea294aa4b28ee4a473aaa8a1edc6c810c11684d1f29f1f3edd336fd0f34',
+    deployed_at_transaction_hash:
+      '0x07065cd9b727b719d16608fa423c62c982ec4a4738fa1f71ea1d69cb6054be51',
+    deployed_at_timestamp: 1687540510,
+    name_tag: 'Flex Marketplace: NFT Marketplace',
+    implementation_type: 'UNKNOWN',
+    is_verified: false,
   },
 ];
