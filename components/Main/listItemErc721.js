@@ -19,8 +19,7 @@ export function ListItemERC721({ transaction, id, toggle, selected }) {
       key={transaction.transaction_hash
         .concat(transaction.spender)
         .concat(transaction.amount)}
-      className="border-b 
-     hover:bg-gray-900 dark:hover:bg-gray-600"
+      className={`border-b rounded-lg ${selected ? 'bg-slate-700' : ''}`}
     >
       <th
         scope="row"
@@ -82,10 +81,10 @@ export function ListItemERC721({ transaction, id, toggle, selected }) {
           <div className="h-2.5 w-2.5 rounded-full bg-purple-500 mr-2" /> Nft
         </div>
       </td>
-      <td className="px-6 py-4 text-4xl">
+      <td className="px-6 py-4 ">
         <button onClick={() => toggle(id)} className="flex align-bottom">
           <AiFillCheckCircle
-            className={selected ? 'text-blue-700 ' : 'text-4xl'}
+            className={`text-4xl ${selected ? 'text-green-700' : ' '}`}
           />
         </button>
       </td>
