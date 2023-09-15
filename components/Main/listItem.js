@@ -99,7 +99,7 @@ export function ListItemERC20({
           <div className="h-2.5 w-2.5 rounded-full bg-green-500 mr-2" /> Token
         </div>
       </td>
-      <td className="px-6 py-4 text-4xl">
+      <td className="px-6 py-4 pl-16 text-4xl">
         <button onClick={() => toggle(id)} className="flex align-bottom">
           <AiFillCheckCircle
             className={selected ? 'text-green-700 ' : 'text-4xl'}
