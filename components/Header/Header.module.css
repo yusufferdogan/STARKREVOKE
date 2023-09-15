@@ -39,7 +39,7 @@
   -webkit-box-reflect: below 1px linear-gradient(transparent, #0005);
 }
 .myButton2:hover {
-  background-color: #9a05a4;
+  background-color: #500855;
   color: #fefefe;
   box-shadow: 0 0 5px #03e9f4, 0 0 25px #03e9f4, 0 0 50px #03e9f4,
     0 0 200px #29e0ea;
@@ -62,7 +62,7 @@
 }
 
 .myButton0:hover {
-  background-color: #a803f4;
+  background-color: #430661;
   color: #03e9f4;
   box-shadow: 0 0 5px #03e9f4, 0 0 25px #03e9f4, 0 0 50px #03e9f4,
     0 0 200px #03e9f4;
