@@ -430,7 +430,8 @@ export const nftData = [
     description: null,
     symbol: 'DARES',
     external_url: null,
-    image_url: null,
+    image_url:
+      'https://cdn.pyramid.market/external/assets/collections/dares/logo.webp',
     banner_url: null,
   },
   {
@@ -452,7 +453,8 @@ export const nftData = [
     description: null,
     symbol: 'BUNNY',
     external_url: null,
-    image_url: null,
+    image_url:
+      'https://cdn.pyramid.market/external/assets/collections/starknet-bunny/logo.webp',
     banner_url: null,
   },
   {
@@ -474,7 +476,8 @@ export const nftData = [
     description: null,
     symbol: 'EXPS',
     external_url: null,
-    image_url: "https://bafybeibzjr34oi5mtmzani3r2h2lthq545cz32brgophxv3lnh6km27bqu.ipfs.dweb.link/6.jpg",
+    image_url:
+      'https://bafybeibzjr34oi5mtmzani3r2h2lthq545cz32brgophxv3lnh6km27bqu.ipfs.dweb.link/6.jpg',
     banner_url: null,
   },
   {

@@ -231,4 +231,19 @@ export const SPENDERS = [
     implementation_type: 'UNKNOWN',
     is_verified: false,
   },
+  {
+    contract_address:
+      '0x046145018634e29304cfff42b61c4225c8ca9900642ac350181b8be97f453ddd',
+    name_tag: 'Starknet Social',
+  },
+  {
+    "contract_address": "0x051734077ba7baf5765896c56ce10b389d80cdcee8622e23c0556fb49e82df1b",
+    "class_hash": "0x0763d0c113243c3b54b38b56d3679faf058c8636365073b679fa96f5c35a7ad6",
+    "deployed_by_contract_address": "0x042f834bc0c91f746aceaa44bf399efff1a4c6586d9b586b0b739b1da0493c5d",
+    "deployed_at_transaction_hash": "0x06ce4aada75d81794a2b7e02f8f63675605e63e8435d2ef73c8f1804baecf241",
+    "deployed_at_timestamp": 1689261956,
+    "name_tag": "Unframed: NFT Marketplace",
+    "implementation_type": "UNKNOWN",
+    "is_verified": false
+  }
 ];
