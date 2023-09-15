@@ -52,7 +52,7 @@ function Home() {
 
       for (const key in erc721map) {
         if (erc721map.hasOwnProperty(key) && selected[key]) {
-          const transaction = erc20map[key].transaction;
+          const transaction = erc721map[key];
           console.log(transaction);
 
           transactions.push({
@@ -65,8 +65,6 @@ function Home() {
           });
         }
       }
-
-      console.log(transactions);
 
       const result = await starknet.account.execute(transactions);
       provider.account
