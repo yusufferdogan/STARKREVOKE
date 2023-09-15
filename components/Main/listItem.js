@@ -87,7 +87,7 @@ export function ListItemERC20({
                 transaction.spender.length
               )}
         </a>
-      </td>{' '}
+      </td>
       <td className="px-6 py-4 text-white">
         {date.toDateString()}
         <p>

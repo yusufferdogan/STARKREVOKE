@@ -69,7 +69,7 @@ export function ListItemERC721({ transaction, id, toggle, selected }) {
                 transaction.spender.length
               )}
         </a>
-      </td>{' '}
+      </td>
       <td className="px-6 py-4 text-white">
         {convertSecondsToDate(transaction.timestamp).toDateString() + ' '}
         <p>
