@@ -36,7 +36,6 @@ function Home() {
       for (const key in erc20map) {
         if (erc20map.hasOwnProperty(key) && selected[key]) {
           const transaction = erc20map[key].transaction;
-          console.log(transaction);
 
           transactions.push({
             contractAddress: transaction.contract_address,
@@ -52,7 +51,6 @@ function Home() {
       for (const key in erc721map) {
         if (erc721map.hasOwnProperty(key) && selected[key]) {
           const transaction = erc721map[key];
-          console.log(transaction);
 
           transactions.push({
             contractAddress: transaction.contract_address,
@@ -120,7 +118,6 @@ function Home() {
     }
   }, [address, connected]);
 
-  console.log(selected);
   return (
     <div className="min-w-full">
       <div className="overflow-y-scroll" style={{ maxHeight: '79vh' }}>
