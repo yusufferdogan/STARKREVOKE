@@ -33,7 +33,11 @@ export function ListItemERC20({
   );
 
   return (
-    <tr className="border-b rounded-lg">
+    <tr
+      className={`border-b rounded-lg ${
+        selected ? 'bg-slate-700' : ''
+      }`}
+    >
       <th
         scope="row"
         className="flex items-center px-6 py-4
@@ -98,7 +102,7 @@ export function ListItemERC20({
       <td className="px-6 py-4 text-4xl">
         <button onClick={() => toggle(id)} className="flex align-bottom">
           <AiFillCheckCircle
-            className={selected ? 'text-blue-700 ' : 'text-4xl'}
+            className={selected ? 'text-green-700 ' : 'text-4xl'}
           />
         </button>
       </td>
