@@ -67,6 +67,7 @@ function Home() {
       provider.account
         .waitForTransaction(result.transaction_hash)
         .then((receipt) => {
+          alert("Revoke is Successful");
           console.log(receipt);
         })
         .catch((error) => {
@@ -103,6 +104,7 @@ function Home() {
         setAddress('');
         setERC20map({});
         setERC721map({});
+        setSelected({});
       } else {
         if (sessionStorage.getItem('connected') === 'true') {
           const savedAddress = sessionStorage.getItem('address');
