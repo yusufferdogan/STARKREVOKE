@@ -20,6 +20,11 @@ function Home() {
       [key]: !prevMap[key],
     }));
   };
+  const deleteFromMap = (key) => {
+    const updatedMap = { ...selected };
+    delete updatedMap[key];
+    setSelected(updatedMap);
+  };
 
   async function sendTx() {
     try {
@@ -53,6 +58,7 @@ function Home() {
           const transaction = erc721map[key];
 
           transactions.push({
+            key: key,
             contractAddress: transaction.contract_address,
             entrypoint: 'setApprovalForAll',
             calldata: CallData.compile({
@@ -64,11 +70,16 @@ function Home() {
       }
 
       const result = await starknet.account.execute(transactions);
-      provider.account
+      console.log(result);
+      starknet.provider
         .waitForTransaction(result.transaction_hash)
         .then((receipt) => {
-          alert("Revoke is Successful");
+          alert('Revoke is Successful');
           console.log(receipt);
+          for (let index = 0; index < transactions.length; index++) {
+            deleteFromMap(transactions[index].key);
+          }
+          setSelected({});
         })
         .catch((error) => {
           console.error('Error waiting for transaction:', error);
