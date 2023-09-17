@@ -5,6 +5,11 @@ import { IoLogoGithub } from 'react-icons/io';
 import { Loader } from './utils';
 import { connect } from '@argent/get-starknet';
 import { RpcProvider, CallData, cairo } from 'starknet';
+
+import { ToastContainer, toast } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
+
 require('dotenv').config();
 function Home() {
   const [connected, setConnected] = useState(false);
@@ -74,12 +79,21 @@ function Home() {
       starknet.provider
         .waitForTransaction(result.transaction_hash)
         .then((receipt) => {
-          alert('Revoke is Successful');
           console.log(receipt);
           for (let index = 0; index < transactions.length; index++) {
             deleteFromMap(transactions[index].key);
           }
           setSelected({});
+          toast.success('Revoke is Successfull', {
+            position: 'top-right',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'light',
+          });
         })
         .catch((error) => {
           console.error('Error waiting for transaction:', error);
@@ -163,6 +177,7 @@ function Home() {
                   Type
                 </th>
                 <th scope="col" className="px-6 py-3">
+                  <ToastContainer />
                   <button
                     onClick={sendTx}
                     disabled={
