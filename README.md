@@ -33,6 +33,13 @@ Ready to run the development server:
 yarn dev
 ```
 
-![image](https://github.com/yusufferdogan/STARKREVOKE/assets/45846424/60cce3ef-f5d3-4e67-afec-566584ef194e)
+![ezgif com-gif-maker](https://github.com/yusufferdogan/STARKREVOKE/assets/45846424/892a7d28-daf0-490b-b77e-fd5e0fe86f32)
 
 ![image](https://github.com/yusufferdogan/STARKREVOKE/assets/45846424/fd9ca8a9-564d-4db5-9f81-5c01ba7273a0)
+
+![image](https://github.com/yusufferdogan/STARKREVOKE/assets/45846424/60cce3ef-f5d3-4e67-afec-566584ef194e)
+
+
+
+
+
