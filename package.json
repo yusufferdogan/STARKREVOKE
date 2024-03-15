@@ -15,11 +15,11 @@
     "@reduxjs/toolkit": "^1.9.5",
     "@starknet-react/core": "^0.16.0",
     "api": "^6.1.0",
-    "axios": "^1.4.0",
+    "axios": "^1.6.0",
     "classnames": "^2.3.2",
     "dotenv": "^16.3.1",
     "get-starknet": "^2.0.0",
-    "next": "^12.1.6",
+    "next": "^13.5.0",
     "next-themes": "^0.2.1",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
@@ -37,7 +37,7 @@
     "eslint": "^8.15.0",
     "eslint-config-next": "^12.1.6",
     "ethers": "^5.6.9",
-    "postcss": "^8.4.14",
+    "postcss": "^8.4.31",
     "tailwindcss": "^3.1.2"
   },
   "eslintConfig": {
